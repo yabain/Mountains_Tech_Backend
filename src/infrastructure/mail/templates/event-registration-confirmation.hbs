@@ -1,0 +1,29 @@
+{{!-- Template : confirmation d'inscription à un événement --}}
+<p>Bonjour <strong>{{firstName}} {{lastName}}</strong>,</p>
+<p>
+  Votre inscription à l'événement <strong>{{eventTitle}}</strong> a bien été enregistrée.
+  Nous vous attendons !
+</p>
+
+<div class="info-box">
+  <strong>Détails de l'événement</strong>
+  <p><strong>Événement :</strong> {{eventTitle}}</p>
+  <p><strong>Date :</strong> {{startAt}}</p>
+  {{#if endAt}}
+    <p><strong>Fin :</strong> {{endAt}}</p>
+  {{/if}}
+  <p><strong>Lieu :</strong> {{location}}</p>
+  <p><strong>Statut :</strong> <span class="status-badge status-approved">Confirmée</span></p>
+  <p><strong>Référence :</strong> {{registrationId}}</p>
+</div>
+
+<p>Ajoutez cet événement à votre agenda et préparez-vous pour une expérience enrichissante.</p>
+
+{{#if eventUrl}}
+  <a href="{{eventUrl}}" class="btn">Voir l'événement</a>
+{{/if}}
+
+<hr class="divider" />
+<p style="font-size:13px; color:#888;">
+  Pour annuler votre inscription, contactez-nous en indiquant votre référence.
+</p>

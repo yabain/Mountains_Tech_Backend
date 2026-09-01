@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MembersModule } from './modules/members/members.module';
@@ -18,10 +20,22 @@ import { MediaModule } from './modules/media/media.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { HealthModule } from './modules/health/health.module';
+import { StorageModule } from './infrastructure/storage/storage.module';
+import { MailModule } from './infrastructure/mail/mail.module';
+import { AuditModule } from './infrastructure/audit/audit.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
+    // ─── Serve uploads folder as static files ─────────────────────────────────
+    // Files accessible at: http://localhost:3000/uploads/<filename>
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: { index: false },
+    }),
+
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -29,6 +43,10 @@ import { HealthModule } from './modules/health/health.module';
         uri: config.get<string>('MONGODB_URI'),
       }),
     }),
+
+    StorageModule,
+    MailModule,
+    AuditModule,
     UsersModule,
     AuthModule,
     MembersModule,

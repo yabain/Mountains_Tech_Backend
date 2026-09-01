@@ -1,0 +1,35 @@
+{{!-- Template : résultat de validation/rejet de candidature membre --}}
+<p>Bonjour <strong>{{representativeName}}</strong>,</p>
+
+{{#if approved}}
+  <p>
+    Nous avons le plaisir de vous informer que la candidature de
+    <strong>{{companyName}}</strong> a été <strong style="color:#155724;">approuvée</strong> !
+    Bienvenue dans la communauté Mountains Tech.
+  </p>
+  <div class="info-box">
+    <strong>Votre entreprise est maintenant membre</strong>
+    <p><strong>Entreprise :</strong> {{companyName}}</p>
+    <p><strong>Statut :</strong> <span class="status-badge status-approved">Approuvé</span></p>
+    <p><strong>Date d'approbation :</strong> {{approvedAt}}</p>
+  </div>
+  <p>Votre profil est désormais visible sur notre annuaire des membres.</p>
+  <a href="{{memberUrl}}" class="btn">Voir mon profil</a>
+{{else}}
+  <p>
+    Après examen de votre dossier, nous ne sommes pas en mesure d'approuver
+    la candidature de <strong>{{companyName}}</strong> pour le moment.
+  </p>
+  <div class="info-box">
+    <strong>Statut de votre candidature</strong>
+    <p><strong>Entreprise :</strong> {{companyName}}</p>
+    <p><strong>Statut :</strong> <span class="status-badge status-rejected">Non retenu</span></p>
+    {{#if reviewComment}}
+      <p><strong>Motif :</strong> {{reviewComment}}</p>
+    {{/if}}
+  </div>
+  <p>
+    Vous pouvez soumettre une nouvelle candidature après avoir mis à jour votre dossier.
+    N'hésitez pas à nous contacter pour plus d'informations.
+  </p>
+{{/if}}

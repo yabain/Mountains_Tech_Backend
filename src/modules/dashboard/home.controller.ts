@@ -8,7 +8,7 @@ import { Project, ProjectDocument } from '../../schemas/project.schema';
 import { Member, MemberDocument } from '../../schemas/member.schema';
 import { Partner, PartnerDocument } from '../../schemas/partner.schema';
 
-@ApiTags('Public — Accueil')
+@ApiTags('Public - Accueil')
 @Controller('public/home')
 export class HomeController {
   constructor(

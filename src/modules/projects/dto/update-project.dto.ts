@@ -9,7 +9,7 @@ import {
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProjectDto {
-  @ApiPropertyOptional({ example: 'Projet numérique — édition 2026' })
+  @ApiPropertyOptional({ example: 'Projet numérique - édition 2026' })
   @IsOptional()
   @IsString()
   title?: string;

@@ -18,8 +18,7 @@ import {
   ApiQuery,
   ApiResponse,
   ApiTags,
-} from '@nestjs/swagger';
-import { HackathonsService } from './hackathons.service';
+} from '@nestjs/swagger';import { HackathonsService } from './hackathons.service';
 import { CreateHackathonDto } from './dto/create-hackathon.dto';
 import { UpdateHackathonDto } from './dto/update-hackathon.dto';
 import { RegisterTeamDto } from './dto/register-team.dto';
@@ -34,7 +33,7 @@ import type { JwtPayload } from '../../common/decorators/current-user.decorator'
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
-@ApiTags('Public — Hackathons')
+@ApiTags('Public - Hackathons')
 @Controller('public/hackathons')
 export class HackathonsPublicController {
   constructor(private readonly hackathonsService: HackathonsService) {}
@@ -96,11 +95,32 @@ export class HackathonsPublicController {
     const data = await this.hackathonsService.registerTeam(hackathonId, dto);
     return { success: true, data, message: 'Équipe enregistrée' };
   }
+
+  /**
+   * GET /api/v1/public/hackathons/:hackathonId/teams
+   */
+  @Get(':hackathonId/teams')
+  @ApiOperation({
+    summary: 'Liste publique des équipes validées',
+    description: 'Retourne uniquement les équipes avec statut APPROVED.',
+  })
+  @ApiParam({ name: 'hackathonId', description: 'ObjectId MongoDB du hackathon' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Équipes approuvées' })
+  async findApprovedTeams(
+    @Param('hackathonId') hackathonId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+  ) {
+    const data = await this.hackathonsService.findTeams(hackathonId, +page, +limit, 'APPROVED');
+    return { success: true, data, message: 'Équipes récupérées' };
+  }
 }
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-@ApiTags('Admin — Hackathons')
+@ApiTags('Admin - Hackathons')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'EDITOR')

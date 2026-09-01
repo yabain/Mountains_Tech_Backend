@@ -18,7 +18,7 @@ export class RolesGuard implements CanActivate {
       ctx.getClass(),
     ]);
 
-    // No @Roles() decorator — any authenticated user is allowed
+    // No @Roles() decorator - any authenticated user is allowed
     if (!requiredRoles || requiredRoles.length === 0) return true;
 
     const request = ctx.switchToHttp().getRequest<{ user: JwtPayload }>();

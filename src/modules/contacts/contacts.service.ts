@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Contact, ContactDocument } from '../../schemas/contact.schema';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
+import { MailService } from '../../infrastructure/mail/mail.service';
+import { NotFoundException } from '@nestjs/common';
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
   NEW: ['IN_PROGRESS', 'SPAM'],
@@ -16,11 +18,23 @@ const STATUS_TRANSITIONS: Record<string, string[]> = {
 export class ContactsService {
   constructor(
     @InjectModel(Contact.name) private readonly contactModel: Model<ContactDocument>,
+    private readonly mailService: MailService,
   ) {}
 
   async create(dto: CreateContactDto) {
     if (!dto.consent) throw new BadRequestException('Le consentement est requis');
     const doc = await this.contactModel.create({ ...dto });
+
+    // Send notification to admin + acknowledgment to sender
+    void this.mailService.sendContactNotification({
+      name: dto.name,
+      email: dto.email,
+      subject: dto.subject,
+      message: dto.message,
+      messageId: String(doc._id),
+      receivedAt: new Date().toLocaleString('fr-FR'),
+    });
+
     return { messageId: String(doc._id) };
   }
 

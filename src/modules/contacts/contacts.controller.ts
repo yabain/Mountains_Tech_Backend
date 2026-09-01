@@ -9,7 +9,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 
-@ApiTags('Public — Contact')
+@ApiTags('Public - Contact')
 @Controller('public/contact')
 export class ContactPublicController {
   constructor(private readonly contactsService: ContactsService) {}
@@ -24,7 +24,7 @@ export class ContactPublicController {
   }
 }
 
-@ApiTags('Admin — Contacts')
+@ApiTags('Admin - Contacts')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN')

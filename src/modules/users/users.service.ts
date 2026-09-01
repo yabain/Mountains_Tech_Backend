@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as argon2 from 'argon2';
+import { randomBytes } from 'crypto';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -134,7 +136,7 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const doc = await this.userModel.findById(id).exec();
     if (!doc) throw new NotFoundException('Utilisateur introuvable');
-    // Soft delete — mark as INACTIVE rather than hard delete
+    // Soft delete - mark as INACTIVE rather than hard delete
     await this.userModel.findByIdAndUpdate(id, { $set: { status: 'INACTIVE' } }).exec();
   }
 
@@ -152,5 +154,42 @@ export class UsersService {
     await this.userModel
       .findByIdAndUpdate(id, { $set: { lastLoginAt: new Date() } })
       .exec();
+  }
+
+  // ─── Password reset ───────────────────────────────────────────────────────
+
+  async generateResetToken(email: string): Promise<{ token: string; user: UserDocument } | null> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) return null; // Don't reveal if email exists
+
+    const token = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.userModel.findByIdAndUpdate(user._id, {
+      $set: { resetPasswordToken: token, resetPasswordExpires: expires },
+    }).exec();
+
+    return { token, user };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userModel.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    }).exec();
+
+    if (!user) {
+      throw new BadRequestException('Token invalide ou expiré');
+    }
+
+    const passwordHash = await argon2.hash(newPassword);
+
+    await this.userModel.findByIdAndUpdate(user._id, {
+      $set: {
+        passwordHash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+      },
+    }).exec();
   }
 }

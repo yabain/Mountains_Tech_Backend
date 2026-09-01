@@ -13,6 +13,8 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { RegisterEventDto } from './dto/register-event.dto';
 import { QueryEventsDto } from './dto/query-events.dto';
 
+import { MailService } from '../../infrastructure/mail/mail.service';
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -36,6 +38,8 @@ export class EventsService {
 
     @InjectModel(EventRegistration.name)
     private readonly registrationModel: Model<EventRegistrationDocument>,
+
+    private readonly mailService: MailService,
   ) {}
 
   // ─── Public ──────────────────────────────────────────────────────────────────
@@ -113,6 +117,18 @@ export class EventsService {
       organization: dto.organization,
       consent: dto.consent,
       status: 'CONFIRMED',
+    });
+
+    // Confirmation email
+    void this.mailService.sendEventRegistrationConfirmation({
+      to: dto.email,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      eventTitle: event.title,
+      startAt: event.startAt.toLocaleString('fr-FR'),
+      endAt: event.endAt?.toLocaleString('fr-FR'),
+      location: event.location ?? 'À définir',
+      registrationId: String(doc._id),
     });
 
     return {

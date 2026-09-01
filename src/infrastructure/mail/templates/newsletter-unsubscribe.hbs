@@ -1,0 +1,18 @@
+{{!-- Template : confirmation de désabonnement newsletter --}}
+<p>Bonjour{{#if firstName}} <strong>{{firstName}}</strong>{{/if}},</p>
+<p>
+  Vous avez été désabonné(e) de la newsletter de <strong>Mountains Tech</strong>.
+  Vous ne recevrez plus nos emails d'information.
+</p>
+
+<div class="info-box">
+  <strong>Désabonnement confirmé</strong>
+  <p><strong>Email :</strong> {{email}}</p>
+  <p><strong>Date :</strong> {{unsubscribedAt}}</p>
+</div>
+
+<p>
+  Si vous souhaitez vous réabonner à l'avenir, vous pouvez le faire depuis
+  notre site web à tout moment.
+</p>
+<a href="{{siteUrl}}" class="btn">Retourner sur le site</a>

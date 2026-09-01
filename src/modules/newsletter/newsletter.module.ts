@@ -5,7 +5,11 @@ import { NewsletterPublicController, NewsletterAdminController } from './newslet
 import { NewsletterSubscriber, NewsletterSubscriberSchema } from '../../schemas/newsletter-subscriber.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: NewsletterSubscriber.name, schema: NewsletterSubscriberSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: NewsletterSubscriber.name, schema: NewsletterSubscriberSchema },
+    ]),
+  ],
   controllers: [NewsletterPublicController, NewsletterAdminController],
   providers: [NewsletterService],
   exports: [NewsletterService],

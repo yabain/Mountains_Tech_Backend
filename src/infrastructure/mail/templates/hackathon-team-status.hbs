@@ -1,0 +1,38 @@
+{{!-- Template : résultat de la validation d'équipe (approuvée ou refusée) --}}
+<p>Bonjour <strong>{{leaderFirstName}} {{leaderLastName}}</strong>,</p>
+
+{{#if approved}}
+  <p>
+    Bonne nouvelle ! L'équipe <strong>{{teamName}}</strong> a été
+    <strong style="color:#155724;">validée</strong> pour participer au hackathon
+    <strong>{{hackathonTitle}}</strong>.
+  </p>
+  <div class="info-box">
+    <strong>Détails de participation</strong>
+    <p><strong>Hackathon :</strong> {{hackathonTitle}}</p>
+    <p><strong>Équipe :</strong> {{teamName}}</p>
+    <p><strong>Statut :</strong> <span class="status-badge status-approved">Validée</span></p>
+    {{#if startDate}}
+      <p><strong>Dates :</strong> {{startDate}} — {{endDate}}</p>
+    {{/if}}
+  </div>
+  <p>Préparez-vous, le jour J approche. Bonne chance à toute l'équipe !</p>
+  {{#if hackathonUrl}}
+    <a href="{{hackathonUrl}}" class="btn">Voir le hackathon</a>
+  {{/if}}
+{{else}}
+  <p>
+    Après examen de votre dossier, nous ne pouvons pas retenir l'équipe
+    <strong>{{teamName}}</strong> pour le hackathon <strong>{{hackathonTitle}}</strong>.
+  </p>
+  <div class="info-box">
+    <strong>Résultat</strong>
+    <p><strong>Hackathon :</strong> {{hackathonTitle}}</p>
+    <p><strong>Équipe :</strong> {{teamName}}</p>
+    <p><strong>Statut :</strong> <span class="status-badge status-rejected">Non retenue</span></p>
+    {{#if reviewComment}}
+      <p><strong>Motif :</strong> {{reviewComment}}</p>
+    {{/if}}
+  </div>
+  <p>Nous espérons vous revoir lors de la prochaine édition.</p>
+{{/if}}

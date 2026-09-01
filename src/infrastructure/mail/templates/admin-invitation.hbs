@@ -1,0 +1,24 @@
+{{!-- Template : invitation / création de compte administrateur --}}
+<p>Bonjour <strong>{{firstName}} {{lastName}}</strong>,</p>
+<p>
+  Un compte administrateur a été créé pour vous sur la plateforme
+  <strong>Mountains Tech</strong>.
+</p>
+
+<div class="info-box">
+  <strong>Vos informations de connexion</strong>
+  <p><strong>Email :</strong> {{email}}</p>
+  <p><strong>Mot de passe temporaire :</strong> <code style="background:#e9ecef; padding:2px 6px; border-radius:3px;">{{tempPassword}}</code></p>
+  <p><strong>Rôle :</strong> {{role}}</p>
+</div>
+
+<p>
+  Veuillez vous connecter et changer votre mot de passe immédiatement.
+</p>
+<a href="{{loginUrl}}" class="btn">Se connecter</a>
+
+<hr class="divider" />
+<p style="font-size:13px; color:#888;">
+  Si vous n'êtes pas concerné par cet email, veuillez le signaler à
+  <a href="mailto:{{adminEmail}}">{{adminEmail}}</a>.
+</p>

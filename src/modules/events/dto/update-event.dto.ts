@@ -11,7 +11,7 @@ import {
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateEventDto {
-  @ApiPropertyOptional({ example: 'Webinaire IA générative — édition 2026' })
+  @ApiPropertyOptional({ example: 'Webinaire IA générative - édition 2026' })
   @IsOptional()
   @IsString()
   title?: string;

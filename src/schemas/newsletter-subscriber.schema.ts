@@ -23,6 +23,9 @@ export class NewsletterSubscriber {
 
   @Prop({ type: Date })
   unsubscribedAt?: Date;
+
+  @Prop({ type: String, default: null })
+  unsubscribeToken!: string | null;
 }
 
 export const NewsletterSubscriberSchema = SchemaFactory.createForClass(NewsletterSubscriber);

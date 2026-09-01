@@ -31,7 +31,7 @@ import type { JwtPayload } from '../../common/decorators/current-user.decorator'
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
-@ApiTags('Public — Projets')
+@ApiTags('Public - Projets')
 @Controller('public/projects')
 export class ProjectsPublicController {
   constructor(private readonly projectsService: ProjectsService) {}
@@ -66,7 +66,7 @@ export class ProjectsPublicController {
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-@ApiTags('Admin — Projets')
+@ApiTags('Admin - Projets')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'EDITOR')

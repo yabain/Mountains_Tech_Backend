@@ -1,0 +1,22 @@
+{{!-- Template : notification de réception d'un message de contact (envoyé à l'admin) --}}
+<p>Bonjour,</p>
+<p>
+  Un nouveau message de contact a été reçu sur le site Mountains Tech.
+</p>
+
+<div class="info-box">
+  <strong>Détails du message</strong>
+  <p><strong>Nom :</strong> {{name}}</p>
+  <p><strong>Email :</strong> <a href="mailto:{{email}}">{{email}}</a></p>
+  <p><strong>Sujet :</strong> {{subject}}</p>
+  <p><strong>Date :</strong> {{receivedAt}}</p>
+  <p><strong>Référence :</strong> {{messageId}}</p>
+</div>
+
+<p><strong>Message :</strong></p>
+<div style="background:#f8f9fa; padding:16px; border-radius:4px; font-size:14px; line-height:1.7;">
+  {{message}}
+</div>
+
+<hr class="divider" />
+<a href="{{adminUrl}}" class="btn">Traiter dans le backoffice</a>

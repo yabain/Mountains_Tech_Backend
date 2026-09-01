@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
-@ApiTags('Public — Paramètres')
+@ApiTags('Public - Paramètres')
 @Controller('public/settings')
 export class SettingsPublicController {
   constructor(private readonly settingsService: SettingsService) {}
@@ -18,7 +18,7 @@ export class SettingsPublicController {
   }
 }
 
-@ApiTags('Admin — Paramètres')
+@ApiTags('Admin - Paramètres')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN')
@@ -34,7 +34,7 @@ export class SettingsAdminController {
   }
 
   @Patch()
-  @ApiOperation({ summary: 'Mettre à jour les paramètres', description: 'Upsert en masse — chaque clé/valeur est créée ou mise à jour.' })
+  @ApiOperation({ summary: 'Mettre à jour les paramètres', description: 'Upsert en masse - chaque clé/valeur est créée ou mise à jour.' })
   @ApiBody({ schema: { type: 'object', additionalProperties: true, example: { siteName: 'Mountains Tech', socialFacebook: 'https://fb.com/mountainstech' } } })
   async update(@Body() body: Record<string, unknown>) {
     const data = await this.settingsService.upsertMany(body);

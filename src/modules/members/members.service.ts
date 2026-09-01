@@ -15,6 +15,8 @@ import { CreateMemberApplicationDto } from './dto/create-member-application.dto'
 import { UpdateMemberStatusDto } from './dto/update-member-status.dto';
 import { QueryMembersDto } from './dto/query-members.dto';
 
+import { MailService } from '../../infrastructure/mail/mail.service';
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -32,6 +34,8 @@ export class MembersService {
 
     @InjectModel(MemberApplication.name)
     private readonly applicationModel: Model<MemberApplicationDocument>,
+
+    private readonly mailService: MailService,
   ) {}
 
   // ─── Public ──────────────────────────────────────────────────────────────────
@@ -100,6 +104,15 @@ export class MembersService {
       status: 'PENDING',
     });
 
+    // Confirmation email to applicant
+    void this.mailService.sendMemberApplicationConfirmation({
+      to: dto.representativeEmail,
+      representativeName: dto.representativeName,
+      companyName: dto.companyName,
+      sectors: dto.sectors ?? [],
+      applicationId: String(doc._id),
+    });
+
     return {
       applicationId: String(doc._id),
       status: doc.status,
@@ -107,6 +120,12 @@ export class MembersService {
   }
 
   // ─── Admin ───────────────────────────────────────────────────────────────────
+
+  async findById(id: string) {
+    const doc = await this.memberModel.findById(id).exec();
+    if (!doc) throw new NotFoundException('Membre introuvable');
+    return this.toObject(doc);
+  }
 
   async findAllAdmin(query: QueryMembersDto) {
     const { page = 1, limit = 20, search, sector, status, sortBy = 'createdAt', sortOrder = 'desc' } = query;
@@ -204,6 +223,16 @@ export class MembersService {
     if (dto.status === 'APPROVED') {
       await this.promoteApplicationToMember(application, reviewerId);
     }
+
+    // Notification email to applicant
+    void this.mailService.sendMemberApplicationReview({
+      to: application.representativeEmail,
+      representativeName: application.representativeName,
+      companyName: application.companyName,
+      approved: dto.status === 'APPROVED',
+      reviewComment: dto.reviewComment,
+      approvedAt: dto.status === 'APPROVED' ? new Date().toLocaleDateString('fr-FR') : undefined,
+    });
 
     return { id, status: dto.status };
   }

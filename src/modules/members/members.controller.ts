@@ -30,7 +30,7 @@ import type { JwtPayload } from '../../common/decorators/current-user.decorator'
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
-@ApiTags('Public — Membres')
+@ApiTags('Public - Membres')
 @Controller('public/members')
 export class MembersPublicController {
   constructor(private readonly membersService: MembersService) {}
@@ -99,7 +99,7 @@ export class MembersPublicController {
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-@ApiTags('Admin — Membres')
+@ApiTags('Admin - Membres')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN')
@@ -133,6 +133,19 @@ export class MembersAdminController {
   async findApplications(@Query() query: QueryMembersDto) {
     const data = await this.membersService.findAllApplicationsAdmin(query);
     return { success: true, data, message: 'Liste des candidatures récupérée' };
+  }
+
+  /**
+   * GET /api/v1/admin/members/:id
+   */
+  @Get(':id')
+  @ApiOperation({ summary: 'Détail admin d\'un membre' })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB du membre' })
+  @ApiResponse({ status: 200, description: 'Membre trouvé', type: MemberResponseDto })
+  @ApiResponse({ status: 404, description: 'Membre introuvable' })
+  async findOne(@Param('id') id: string) {
+    const data = await this.membersService.findById(id);
+    return { success: true, data, message: 'Membre récupéré' };
   }
 
   /**

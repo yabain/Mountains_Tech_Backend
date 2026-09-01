@@ -8,7 +8,7 @@ export class EventRegistration {
   @Prop({ type: Types.ObjectId, required: true, ref: 'EventEntity' })
   eventId!: Types.ObjectId;
 
-  // Participant info (no auth required — public registration)
+  // Participant info (no auth required - public registration)
   @Prop({ required: true })
   firstName!: string;
 

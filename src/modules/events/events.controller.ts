@@ -33,7 +33,7 @@ import type { JwtPayload } from '../../common/decorators/current-user.decorator'
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
-@ApiTags('Public — Événements')
+@ApiTags('Public - Événements')
 @Controller('public/events')
 export class EventsPublicController {
   constructor(private readonly eventsService: EventsService) {}
@@ -102,7 +102,7 @@ export class EventsPublicController {
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-@ApiTags('Admin — Événements')
+@ApiTags('Admin - Événements')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'EDITOR')

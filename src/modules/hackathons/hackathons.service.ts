@@ -14,6 +14,8 @@ import { RegisterTeamDto } from './dto/register-team.dto';
 import { UpdateTeamStatusDto } from './dto/update-team-status.dto';
 import { QueryHackathonsDto } from './dto/query-hackathons.dto';
 
+import { MailService } from '../../infrastructure/mail/mail.service';
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -37,6 +39,8 @@ export class HackathonsService {
 
     @InjectModel(HackathonTeam.name)
     private readonly teamModel: Model<HackathonTeamDocument>,
+
+    private readonly mailService: MailService,
   ) {}
 
   // ─── Public ──────────────────────────────────────────────────────────────────
@@ -117,6 +121,21 @@ export class HackathonsService {
       technologyStack: dto.technologyStack ?? [],
       consent: dto.consent,
       status: 'PENDING',
+    });
+
+    // Confirmation email to team leader
+    void this.mailService.sendHackathonTeamConfirmation({
+      to: dto.leader.email,
+      leaderFirstName: dto.leader.firstName,
+      leaderLastName: dto.leader.lastName,
+      teamName: dto.teamName,
+      hackathonTitle: hackathon.title,
+      memberCount: 1 + (dto.members?.length ?? 0),
+      projectIdea: dto.projectIdea,
+      teamId: String(doc._id),
+      registrationDeadline: hackathon.registrationDeadline?.toLocaleDateString('fr-FR'),
+      startDate: hackathon.startDate?.toLocaleDateString('fr-FR'),
+      endDate: hackathon.endDate?.toLocaleDateString('fr-FR'),
     });
 
     return { teamId: String(doc._id), status: doc.status };
@@ -278,6 +297,20 @@ export class HackathonsService {
         reviewedAt: new Date(),
       },
     }).exec();
+
+    // Notify team leader by email
+    const hackathon = await this.hackathonModel.findById(team.hackathonId).exec();
+    void this.mailService.sendHackathonTeamStatus({
+      to: team.leader.email,
+      leaderFirstName: team.leader.firstName,
+      leaderLastName: team.leader.lastName,
+      teamName: team.teamName,
+      hackathonTitle: hackathon?.title ?? '',
+      approved: dto.status === 'APPROVED',
+      reviewComment: dto.reviewComment,
+      startDate: hackathon?.startDate?.toLocaleDateString('fr-FR'),
+      endDate: hackathon?.endDate?.toLocaleDateString('fr-FR'),
+    });
 
     return { teamId, status: dto.status };
   }

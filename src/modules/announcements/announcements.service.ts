@@ -77,7 +77,7 @@ export class AnnouncementsService {
       throw new BadRequestException('Cette campagne ne peut pas être envoyée');
     }
 
-    // Mark as PROCESSING — actual sending would be done by a queue/worker
+    // Mark as PROCESSING - actual sending would be done by a queue/worker
     await this.announcementModel.findByIdAndUpdate(id, {
       $set: { status: 'PROCESSING' },
     }).exec();

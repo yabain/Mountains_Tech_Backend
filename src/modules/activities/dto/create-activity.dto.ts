@@ -15,7 +15,7 @@ export class CreateActivityDto {
 
   @ApiPropertyOptional({
     example: 'atelier-developpement-web',
-    description: 'Slug URL — généré automatiquement si non fourni',
+    description: 'Slug URL - généré automatiquement si non fourni',
   })
   @IsOptional()
   @IsString()

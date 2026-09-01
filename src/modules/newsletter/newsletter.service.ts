@@ -1,14 +1,17 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { randomBytes } from 'crypto';
 import { NewsletterSubscriber, NewsletterSubscriberDocument } from '../../schemas/newsletter-subscriber.schema';
 import { SubscribeDto } from './dto/subscribe.dto';
+import { MailService } from '../../infrastructure/mail/mail.service';
 
 @Injectable()
 export class NewsletterService {
   constructor(
     @InjectModel(NewsletterSubscriber.name)
     private readonly subscriberModel: Model<NewsletterSubscriberDocument>,
+    private readonly mailService: MailService,
   ) {}
 
   async subscribe(dto: SubscribeDto) {
@@ -24,6 +27,13 @@ export class NewsletterService {
       await this.subscriberModel.findByIdAndUpdate(existing._id, {
         $set: { status: 'SUBSCRIBED', consent: true, consentAt: new Date(), unsubscribedAt: null },
       }).exec();
+
+      void this.mailService.sendNewsletterSubscriptionConfirmation({
+        to: dto.email,
+        firstName: dto.firstName,
+        subscribedAt: new Date().toLocaleDateString('fr-FR'),
+      });
+
       return { status: 'SUBSCRIBED' };
     }
 
@@ -33,6 +43,12 @@ export class NewsletterService {
       consent: dto.consent,
       consentAt: new Date(),
       status: 'SUBSCRIBED',
+    });
+
+    void this.mailService.sendNewsletterSubscriptionConfirmation({
+      to: dto.email,
+      firstName: dto.firstName,
+      subscribedAt: new Date().toLocaleDateString('fr-FR'),
     });
 
     return { status: 'SUBSCRIBED' };
@@ -45,6 +61,45 @@ export class NewsletterService {
     await this.subscriberModel.findByIdAndUpdate(sub._id, {
       $set: { status: 'UNSUBSCRIBED', unsubscribedAt: new Date() },
     }).exec();
+
+    void this.mailService.sendNewsletterUnsubscribeConfirmation({
+      to: sub.email,
+      firstName: sub.firstName,
+      unsubscribedAt: new Date().toLocaleDateString('fr-FR'),
+    });
+  }
+
+  async unsubscribeByToken(token: string): Promise<{ email: string; firstName?: string }> {
+    const sub = await this.subscriberModel.findOne({
+      unsubscribeToken: token,
+      status: 'SUBSCRIBED',
+    }).exec();
+
+    if (!sub) throw new NotFoundException('Token invalide ou déjà désabonné');
+
+    await this.subscriberModel.findByIdAndUpdate(sub._id, {
+      $set: { status: 'UNSUBSCRIBED', unsubscribedAt: new Date(), unsubscribeToken: null },
+    }).exec();
+
+    void this.mailService.sendNewsletterUnsubscribeConfirmation({
+      to: sub.email,
+      firstName: sub.firstName,
+      unsubscribedAt: new Date().toLocaleDateString('fr-FR'),
+    });
+
+    return { email: sub.email, firstName: sub.firstName };
+  }
+
+  async generateUnsubscribeToken(email: string): Promise<string | null> {
+    const sub = await this.subscriberModel.findOne({ email, status: 'SUBSCRIBED' }).exec();
+    if (!sub) return null;
+
+    const token = randomBytes(32).toString('hex');
+    await this.subscriberModel.findByIdAndUpdate(sub._id, {
+      $set: { unsubscribeToken: token },
+    }).exec();
+
+    return token;
   }
 
   async findAll(page = 1, limit = 20, status?: string) {

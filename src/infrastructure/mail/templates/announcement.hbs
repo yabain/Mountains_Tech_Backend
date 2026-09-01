@@ -1,0 +1,10 @@
+{{!-- Template : campagne d'annonce / newsletter --}}
+<p>{{#if firstName}}Bonjour <strong>{{firstName}}</strong>,{{else}}Bonjour,{{/if}}</p>
+
+{{{contentHtml}}}
+
+<hr class="divider" />
+<p style="font-size:12px; color:#aaa; text-align:center;">
+  Vous recevez cet email car vous êtes abonné(e) à la newsletter de Mountains Tech.<br/>
+  <a href="{{unsubscribeUrl}}" style="color:#e07b39;">Se désabonner</a>
+</p>

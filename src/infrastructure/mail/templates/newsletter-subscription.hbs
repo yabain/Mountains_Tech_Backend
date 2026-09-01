@@ -1,0 +1,20 @@
+{{!-- Template : confirmation d'inscription à la newsletter --}}
+<p>Bonjour{{#if firstName}} <strong>{{firstName}}</strong>{{/if}},</p>
+<p>
+  Vous êtes maintenant inscrit(e) à la newsletter de <strong>Mountains Tech</strong>.
+  Vous recevrez nos dernières actualités, événements et opportunités directement dans votre boîte mail.
+</p>
+
+<div class="info-box">
+  <strong>Votre inscription</strong>
+  <p><strong>Email :</strong> {{email}}</p>
+  <p><strong>Statut :</strong> <span class="status-badge status-approved">Inscrit(e)</span></p>
+  <p><strong>Date :</strong> {{subscribedAt}}</p>
+</div>
+
+<p>
+  Pour vous désabonner à tout moment, cliquez sur le lien de désabonnement
+  présent en bas de chaque email que vous recevrez.
+</p>
+
+<a href="{{siteUrl}}" class="btn">Découvrir nos actualités</a>

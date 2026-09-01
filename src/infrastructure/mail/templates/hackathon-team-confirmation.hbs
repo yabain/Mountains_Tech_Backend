@@ -1,0 +1,31 @@
+{{!-- Template : confirmation d'inscription d'une équipe à un hackathon --}}
+<p>Bonjour <strong>{{leaderFirstName}} {{leaderLastName}}</strong>,</p>
+<p>
+  L'équipe <strong>{{teamName}}</strong> a bien été inscrite au hackathon
+  <strong>{{hackathonTitle}}</strong>. Votre dossier est en cours d'examen.
+</p>
+
+<div class="info-box">
+  <strong>Récapitulatif de l'inscription</strong>
+  <p><strong>Hackathon :</strong> {{hackathonTitle}}</p>
+  <p><strong>Équipe :</strong> {{teamName}}</p>
+  <p><strong>Nombre de membres :</strong> {{memberCount}}</p>
+  {{#if projectIdea}}
+    <p><strong>Idée de projet :</strong> {{projectIdea}}</p>
+  {{/if}}
+  <p><strong>Statut :</strong> <span class="status-badge status-pending">En attente de validation</span></p>
+  <p><strong>Référence :</strong> {{teamId}}</p>
+</div>
+
+{{#if registrationDeadline}}
+  <p><strong>Date limite d'inscription :</strong> {{registrationDeadline}}</p>
+{{/if}}
+{{#if startDate}}
+  <p><strong>Dates du hackathon :</strong> {{startDate}} — {{endDate}}</p>
+{{/if}}
+
+<p>Vous serez notifié dès que votre équipe sera validée. Bonne chance !</p>
+
+{{#if hackathonUrl}}
+  <a href="{{hackathonUrl}}" class="btn">Voir le hackathon</a>
+{{/if}}

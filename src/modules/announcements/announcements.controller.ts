@@ -16,7 +16,7 @@ class ScheduleDto {
   scheduledAt!: string;
 }
 
-@ApiTags('Admin — Annonces')
+@ApiTags('Admin - Annonces')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'COMMUNICATION')

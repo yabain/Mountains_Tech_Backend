@@ -11,7 +11,7 @@ export class UpdateMemberStatusDto {
   status!: string;
 
   @ApiPropertyOptional({
-    example: 'Dossier incomplet — merci de fournir les documents manquants.',
+    example: 'Dossier incomplet - merci de fournir les documents manquants.',
     description: 'Commentaire de révision (obligatoire en cas de rejet)',
   })
   @IsOptional()

@@ -1,14 +1,32 @@
 import {
-  Body, Controller, Delete, Get, HttpCode, HttpStatus,
-  Param, Post, Query, UploadedFile, UseGuards, UseInterceptors,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation,
-  ApiParam, ApiQuery, ApiResponse, ApiTags,
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { memoryStorage } from 'multer';
 import { MediaService } from './media.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -16,10 +34,18 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 
-class UploadMediaDto {
+class UpdateMediaAltDto {
   @ApiPropertyOptional({ example: 'Logo Mountains Tech' })
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   alt?: string;
+}
+
+interface MulterFile {
+  originalname: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
 }
 
 @ApiTags('Admin — Médias')
@@ -30,11 +56,14 @@ class UploadMediaDto {
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
+  /**
+   * GET /api/v1/admin/media
+   */
   @Get()
-  @ApiOperation({ summary: 'Liste des médias' })
+  @ApiOperation({ summary: 'Liste des médias uploadés' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiQuery({ name: 'mimeType', required: false, description: 'Filtrer par type MIME (ex: image)' })
+  @ApiQuery({ name: 'mimeType', required: false, description: 'Filtrer par type MIME (ex: image, video)' })
   async findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
@@ -44,46 +73,74 @@ export class MediaController {
     return { success: true, data, message: 'Médias récupérés' };
   }
 
+  /**
+   * POST /api/v1/admin/media/upload
+   */
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
+      required: ['file'],
       properties: {
-        file: { type: 'string', format: 'binary' },
-        alt: { type: 'string' },
+        file: { type: 'string', format: 'binary', description: 'Fichier (max 10 Mo)' },
+        alt: { type: 'string', description: 'Texte alternatif (accessibilité)' },
       },
     },
   })
   @ApiOperation({
-    summary: 'Téléverser un média',
+    summary: 'Uploader un média',
     description:
-      'Upload d\'image/fichier. En production, le fichier est envoyé vers le provider de stockage configuré (S3, Cloudinary, etc.) et seules les métadonnées sont stockées en base.',
+      'Types acceptés : JPEG, PNG, WebP, GIF, SVG, PDF, MP4, WebM. ' +
+      'Stocké dans uploads/ et accessible via /uploads/<uuid>.<ext>.',
   })
   async upload(
-    @UploadedFile() file: { originalname: string; mimetype: string; size: number; buffer: Buffer },
-    @Body() dto: UploadMediaDto,
+    @UploadedFile() file: MulterFile,
+    @Body() dto: UpdateMediaAltDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    // In production: upload to storage provider, get back URL
-    // For now we store the metadata with a placeholder URL
     const data = await this.mediaService.create({
-      fileName: file.originalname,
+      buffer: file.buffer,
+      originalName: file.originalname,
       mimeType: file.mimetype,
       size: file.size,
-      url: `/uploads/${file.originalname}`, // replace with CDN URL in production
       alt: dto.alt,
       uploadedBy: user.sub,
     });
-    return { success: true, data, message: 'Média téléversé' };
+    return { success: true, data, message: 'Média uploadé avec succès' };
   }
 
+  /**
+   * PATCH /api/v1/admin/media/:id
+   * Update alt text metadata
+   */
+  @Patch(':id')
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB du média' })
+  @ApiOperation({ summary: 'Modifier le texte alternatif d\'un média' })
+  @ApiResponse({ status: 200, description: 'Média mis à jour' })
+  @ApiResponse({ status: 404, description: 'Média introuvable' })
+  async update(@Param('id') id: string, @Body() dto: UpdateMediaAltDto) {
+    const data = await this.mediaService.update(id, { alt: dto.alt });
+    return { success: true, data, message: 'Média mis à jour' };
+  }
+
+  /**
+   * DELETE /api/v1/admin/media/:id
+   */
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id' })
-  @ApiOperation({ summary: 'Supprimer un média' })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB du média' })
+  @ApiOperation({
+    summary: 'Supprimer un média',
+    description: 'Supprime le fichier physique du disque ET l\'enregistrement en base.',
+  })
   async remove(@Param('id') id: string): Promise<void> {
     await this.mediaService.remove(id);
   }
