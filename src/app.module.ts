@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { BullModule } from '@nestjs/bullmq';
 import { join } from 'path';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -23,6 +24,8 @@ import { HealthModule } from './modules/health/health.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { MailModule } from './infrastructure/mail/mail.module';
 import { AuditModule } from './infrastructure/audit/audit.module';
+import { QueuesModule } from './infrastructure/queues/queues.module';
+import { buildRedisConnection } from './infrastructure/queues/redis.config';
 
 @Module({
   imports: [
@@ -44,9 +47,19 @@ import { AuditModule } from './infrastructure/audit/audit.module';
       }),
     }),
 
+    // ─── BullMQ root connection ───────────────────────────────────────────────
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: buildRedisConnection(config),
+      }),
+    }),
+
     StorageModule,
     MailModule,
     AuditModule,
+    QueuesModule,
     UsersModule,
     AuthModule,
     MembersModule,

@@ -33,6 +33,20 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagnes récupérées' };
   }
 
+  @Get(':id/recipients')
+  @ApiParam({ name: 'id' })
+  @ApiOperation({ summary: 'Liste des destinataires d\'une campagne' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async findRecipients(
+    @Param('id') id: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 50,
+  ) {
+    const data = await this.announcementsService.findRecipients(id, +page, +limit);
+    return { success: true, data, message: 'Destinataires récupérés' };
+  }
+
   @Get(':id')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Détail d\'une campagne' })
