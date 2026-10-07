@@ -30,7 +30,7 @@ export class TransformInterceptor<T>
   ): Observable<ApiResponse<T>> {
     return next.handle().pipe(
       map((data) => {
-        // Already wrapped — pass through
+        // Already wrapped - pass through
         if (
           data !== null &&
           data !== undefined &&
@@ -41,7 +41,7 @@ export class TransformInterceptor<T>
           return data as ApiResponse<T>;
         }
 
-        // Null/undefined (204 No Content) — pass through
+        // Null/undefined (204 No Content) - pass through
         if (data === null || data === undefined) {
           return data as unknown as ApiResponse<T>;
         }

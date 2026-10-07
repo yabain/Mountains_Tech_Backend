@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../modules/auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
-@ApiTags('Admin — Audit Logs')
+@ApiTags('Admin - Audit Logs')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN')

@@ -33,7 +33,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { MailService } from '../../infrastructure/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 
-@ApiTags('Admin — Utilisateurs')
+@ApiTags('Admin - Utilisateurs')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN')
@@ -149,7 +149,7 @@ export class UsersController {
   }
 }
 
-// ─── Password reset (public — no auth required) ───────────────────────────────
+// ─── Password reset (public - no auth required) ───────────────────────────────
 
 @ApiTags('Authentification')
 @Controller('auth')

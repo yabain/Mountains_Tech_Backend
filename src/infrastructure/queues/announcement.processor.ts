@@ -17,7 +17,7 @@ export interface AnnouncementJobData {
 export class AnnouncementProcessor extends WorkerHost {
   private readonly logger = new Logger(AnnouncementProcessor.name);
 
-  // Batch size — send emails in groups to avoid overwhelming the SMTP server
+  // Batch size - send emails in groups to avoid overwhelming the SMTP server
   private readonly BATCH_SIZE = 20;
 
   constructor(
@@ -140,7 +140,7 @@ export class AnnouncementProcessor extends WorkerHost {
       }).exec();
 
       this.logger.log(
-        `Announcement ${announcementId} done — status=${finalStatus}, sent=${sent}, failed=${failed}`,
+        `Announcement ${announcementId} done - status=${finalStatus}, sent=${sent}, failed=${failed}`,
       );
     } catch (error) {
       this.logger.error(`Announcement ${announcementId} processing failed`, error);

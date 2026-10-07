@@ -27,15 +27,15 @@ export class MailService {
   private readonly templateCache = new Map<string, HandlebarsTemplateDelegate>();
 
   constructor(private readonly config: ConfigService) {
-    this.from = config.get<string>('MAIL_FROM') ?? 'no-reply@mountainstech.cm';
+    this.from = config.get<string>('MAIL_FROM') ?? 'tientcheuigorcarel@gmail.com';
     this.siteUrl = config.get<string>('PUBLIC_URL') ?? 'http://localhost:3000';
     this.adminUrl = config.get<string>('ADMIN_URL') ?? 'http://localhost:4200';
     this.templateDir = path.join(__dirname, 'templates');
 
     this.transporter = nodemailer.createTransport({
       host: config.getOrThrow<string>('SMTP_HOST'),
-      port: config.get<number>('SMTP_PORT') ?? 587,
-      secure: config.get<number>('SMTP_PORT') === 465,
+      port: Number(config.get('SMTP_PORT') ?? 587),
+      secure: Number(config.get('SMTP_PORT') ?? 587) === 465,
       auth: {
         user: config.getOrThrow<string>('SMTP_USER'),
         pass: config.getOrThrow<string>('SMTP_PASSWORD'),
@@ -43,9 +43,9 @@ export class MailService {
     });
   }
 
-  // ─── Core send method ─────────────────────────────────────────────────────
+  // ─── Core send method ────────────────────────────────────────────────────
 
-  async send(options: SendMailOptions): Promise<void> {
+  async send(options: SendMailOptions, throwOnError = false): Promise<void> {
     try {
       const html = this.renderTemplate(options.template, {
         ...options.context,
@@ -68,7 +68,7 @@ export class MailService {
         `Échec envoi email → ${options.to} | ${options.subject}`,
         error instanceof Error ? error.stack : String(error),
       );
-      // Don't throw — email failures should never crash the main request
+      if (throwOnError) throw error;
     }
   }
 
@@ -83,7 +83,7 @@ export class MailService {
   }): Promise<void> {
     await this.send({
       to: data.to,
-      subject: 'Votre demande d\'adhésion a bien été reçue — Mountains Tech',
+      subject: 'Votre demande d\'adhésion a bien été reçue - Mountains Tech',
       template: 'member-application-confirmation',
       context: {
         ...data,
@@ -103,7 +103,7 @@ export class MailService {
   }): Promise<void> {
     const subject = data.approved
       ? `Félicitations ! Votre adhésion à Mountains Tech est approuvée`
-      : `Résultat de votre candidature — Mountains Tech`;
+      : `Résultat de votre candidature - Mountains Tech`;
 
     await this.send({
       to: data.to,
@@ -148,7 +148,7 @@ export class MailService {
   }): Promise<void> {
     await this.send({
       to: data.to,
-      subject: `Équipe enregistrée pour ${data.hackathonTitle} — Mountains Tech`,
+      subject: `Équipe enregistrée pour ${data.hackathonTitle} - Mountains Tech`,
       template: 'hackathon-team-confirmation',
       context: data,
     });
@@ -176,7 +176,7 @@ export class MailService {
     // Acknowledge sender
     await this.send({
       to: data.email,
-      subject: 'Votre message a été reçu — Mountains Tech',
+      subject: 'Votre message a été reçu - Mountains Tech',
       template: 'contact-acknowledgment',
       context: data,
     });
@@ -192,7 +192,7 @@ export class MailService {
   }): Promise<void> {
     await this.send({
       to: data.to,
-      subject: 'Invitation — Accès à la plateforme Mountains Tech',
+      subject: 'Invitation - Accès à la plateforme Mountains Tech',
       template: 'admin-invitation',
       context: {
         ...data,
@@ -242,7 +242,7 @@ export class MailService {
   }): Promise<void> {
     await this.send({
       to: data.to,
-      subject: 'Réinitialisation de votre mot de passe — Mountains Tech',
+      subject: 'Réinitialisation de votre mot de passe - Mountains Tech',
       template: 'reset-password',
       context: data,
     });
@@ -261,8 +261,8 @@ export class MailService {
     hackathonUrl?: string;
   }): Promise<void> {
     const subject = data.approved
-      ? `Équipe validée pour ${data.hackathonTitle} — Mountains Tech`
-      : `Résultat candidature équipe — ${data.hackathonTitle}`;
+      ? `Équipe validée pour ${data.hackathonTitle} - Mountains Tech`
+      : `Résultat candidature équipe - ${data.hackathonTitle}`;
 
     await this.send({
       to: data.to,
@@ -279,7 +279,7 @@ export class MailService {
   }): Promise<void> {
     await this.send({
       to: data.to,
-      subject: 'Désabonnement confirmé — Mountains Tech',
+      subject: 'Désabonnement confirmé - Mountains Tech',
       template: 'newsletter-unsubscribe',
       context: { ...data, email: data.to },
     });

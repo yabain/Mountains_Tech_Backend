@@ -13,7 +13,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
-@ApiTags('Public — Newsletter')
+@ApiTags('Public - Newsletter')
 @Controller('public/newsletter')
 export class NewsletterPublicController {
   constructor(private readonly newsletterService: NewsletterService) {}
@@ -56,7 +56,7 @@ export class NewsletterPublicController {
 
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
-@ApiTags('Admin — Newsletter')
+@ApiTags('Admin - Newsletter')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'COMMUNICATION')

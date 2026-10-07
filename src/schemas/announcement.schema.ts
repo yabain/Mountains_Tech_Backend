@@ -46,7 +46,7 @@ export class Announcement {
   @Prop({ type: String })
   createdBy?: string;
 
-  // BullMQ job ID — used to cancel scheduled campaigns
+  // BullMQ job ID - used to cancel scheduled campaigns
   @Prop({ type: String, default: null })
   bullJobId!: string | null;
 }

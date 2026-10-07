@@ -120,7 +120,7 @@ export class AnnouncementsService {
       );
     }
 
-    // Add job to queue — immediate execution
+    // Add job to queue - immediate execution
     const job = await this.announcementQueue.add(
       AnnouncementJobs.SEND_NOW,
       { announcementId: id },

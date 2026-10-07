@@ -48,7 +48,7 @@ interface MulterFile {
   buffer: Buffer;
 }
 
-@ApiTags('Admin — Médias')
+@ApiTags('Admin - Médias')
 @ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('SUPER_ADMIN', 'ADMIN', 'EDITOR')
