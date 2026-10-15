@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { MembersService } from './members.service';
 import { CreateMemberApplicationDto } from './dto/create-member-application.dto';
+import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberStatusDto } from './dto/update-member-status.dto';
 import { QueryMembersDto } from './dto/query-members.dto';
 import { MemberResponseDto, MemberApplicationResponseDto } from './dto/member-response.dto';
@@ -106,6 +107,26 @@ export class MembersPublicController {
 @Controller('admin/members')
 export class MembersAdminController {
   constructor(private readonly membersService: MembersService) {}
+
+  /**
+   * POST /api/v1/admin/members
+   */
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Créer un membre directement',
+    description:
+      'Permet à un admin de créer un membre avec statut APPROVED immédiatement, sans passer par le flux de candidature.',
+  })
+  @ApiResponse({ status: 201, description: 'Membre créé', type: MemberResponseDto })
+  @ApiResponse({ status: 409, description: 'Un membre existe déjà avec cet email représentant' })
+  async create(
+    @Body() dto: CreateMemberDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    const data = await this.membersService.createMember(dto, user.sub);
+    return { success: true, data, message: 'Membre créé avec succès' };
+  }
 
   /**
    * GET /api/v1/admin/members

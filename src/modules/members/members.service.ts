@@ -12,6 +12,7 @@ import {
   MemberApplicationDocument,
 } from '../../schemas/member-application.schema';
 import { CreateMemberApplicationDto } from './dto/create-member-application.dto';
+import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberStatusDto } from './dto/update-member-status.dto';
 import { QueryMembersDto } from './dto/query-members.dto';
 
@@ -120,6 +121,33 @@ export class MembersService {
   }
 
   // ─── Admin ───────────────────────────────────────────────────────────────────
+
+  async createMember(dto: CreateMemberDto, reviewerId: string) {
+    // Check for duplicate representative email
+    const existing = await this.memberModel.findOne({
+      representativeEmail: dto.representativeEmail,
+    }).exec();
+
+    if (existing) {
+      throw new ConflictException(
+        'Un membre existe déjà avec cet email représentant',
+      );
+    }
+
+    const baseSlug = slugify(dto.companyName);
+    const slug = await this.ensureUniqueSlug(baseSlug);
+
+    const doc = await this.memberModel.create({
+      ...dto,
+      sectors: dto.sectors ?? [],
+      slug,
+      status: 'APPROVED',
+      approvedAt: new Date(),
+      reviewedBy: reviewerId,
+    });
+
+    return this.toObject(doc);
+  }
 
   async findById(id: string) {
     const doc = await this.memberModel.findById(id).exec();
