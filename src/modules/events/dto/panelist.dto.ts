@@ -19,7 +19,22 @@ export class PanelistDto {
   photoUrl?: string;
 }
 
-export class AddPanelistDto extends PanelistDto {}
+/**
+ * Payload for the multipart POST route. The photo is sent as a `file` field,
+ * saved to /uploads, and its URL is stored in photoUrl. photoUrl is NOT read
+ * from the body — it always comes from the uploaded file.
+ */
+export class AddPanelistDto {
+  @ApiProperty({ example: 'Aïcha Bello' })
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
+
+  @ApiProperty({ example: 'CTO @ Yaba-In' })
+  @IsString()
+  @IsNotEmpty()
+  role!: string;
+}
 
 export class UpdatePanelistsDto {
   @ApiProperty({ type: [PanelistDto] })

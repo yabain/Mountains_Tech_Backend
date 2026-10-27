@@ -10,10 +10,16 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -33,6 +39,13 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
 import { Audit } from '../../common/decorators/audit.decorator';
+
+interface MulterFile {
+  originalname: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+}
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -211,16 +224,44 @@ export class EventsAdminController {
 
   /**
    * POST /api/v1/admin/events/:id/panelists
+   * multipart/form-data: name, role, and an optional `file` (the panelist photo).
+   * The photo is saved to /uploads and its URL is stored in photoUrl.
    */
   @Audit({ action: 'UPDATE', resource: 'events', category: 'CONTENT' })
   @Post(':id/panelists')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Ajouter un panéliste à un événement' })
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['name', 'role'],
+      properties: {
+        name: { type: 'string', description: 'Nom du panéliste' },
+        role: { type: 'string', description: 'Rôle / fonction' },
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Photo du panéliste (optionnel, max 10 Mo)',
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: 'Ajouter un panéliste (photo optionnelle via upload)' })
   @ApiParam({ name: 'id', description: 'ObjectId MongoDB de l\'événement' })
   @ApiResponse({ status: 200, description: 'Panéliste ajouté' })
   @ApiResponse({ status: 404, description: 'Événement introuvable' })
-  async addPanelist(@Param('id') id: string, @Body() dto: AddPanelistDto) {
-    const data = await this.eventsService.addPanelist(id, dto);
+  async addPanelist(
+    @Param('id') id: string,
+    @UploadedFile() file: MulterFile | undefined,
+    @Body() dto: AddPanelistDto,
+  ) {
+    const data = await this.eventsService.addPanelist(id, dto, file);
     return { success: true, data, message: 'Panéliste ajouté' };
   }
 

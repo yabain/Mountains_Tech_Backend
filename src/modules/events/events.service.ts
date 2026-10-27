@@ -16,6 +16,15 @@ import { AddPanelistDto } from './dto/panelist.dto';
 import { UpdatePanelistsDto } from './dto/panelist.dto';
 
 import { MailService } from '../../infrastructure/mail/mail.service';
+import { StorageService } from '../../infrastructure/storage/storage.service';
+
+/** Fields needed from the uploaded photo file (from multer). */
+export interface PanelistPhotoFile {
+  buffer: Buffer;
+  originalname: string;
+  mimetype: string;
+  size: number;
+}
 
 function slugify(text: string): string {
   return text
@@ -42,6 +51,8 @@ export class EventsService {
     private readonly registrationModel: Model<EventRegistrationDocument>,
 
     private readonly mailService: MailService,
+
+    private readonly storageService: StorageService,
   ) {}
 
   // ─── Public ──────────────────────────────────────────────────────────────────
@@ -271,7 +282,20 @@ export class EventsService {
     };
   }
 
-  async addPanelist(eventId: string, dto: AddPanelistDto) {
+  async addPanelist(eventId: string, dto: AddPanelistDto, file?: PanelistPhotoFile) {
+    let photoUrl: string | undefined;
+
+    // If a photo file was sent, save it to /uploads and use the returned URL.
+    if (file) {
+      const saved = this.storageService.save(
+        file.buffer,
+        file.originalname,
+        file.mimetype,
+        file.size,
+      );
+      photoUrl = saved.url;
+    }
+
     const updated = await this.eventModel
       .findByIdAndUpdate(
         eventId,
@@ -280,7 +304,7 @@ export class EventsService {
             panelists: {
               name: dto.name,
               role: dto.role,
-              photoUrl: dto.photoUrl,
+              photoUrl,
             },
           },
         },
