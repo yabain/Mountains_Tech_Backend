@@ -30,6 +30,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 import { MailService } from '../../infrastructure/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -100,6 +101,7 @@ export class UsersController {
   /**
    * POST /api/v1/admin/users
    */
+  @Audit({ action: 'CREATE', resource: 'users', category: 'USER_MANAGEMENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -117,6 +119,7 @@ export class UsersController {
   /**
    * PATCH /api/v1/admin/users/:id
    */
+  @Audit({ action: 'UPDATE', resource: 'users', category: 'USER_MANAGEMENT' })
   @Patch(':id')
   @ApiOperation({
     summary: 'Modifier un utilisateur',
@@ -135,6 +138,7 @@ export class UsersController {
    * DELETE /api/v1/admin/users/:id
    * Soft delete - passe le statut à INACTIVE
    */
+  @Audit({ action: 'DELETE', resource: 'users', category: 'USER_MANAGEMENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({

@@ -33,6 +33,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 class UpdateMediaAltDto {
   @ApiPropertyOptional({ example: 'Logo Mountains Tech' })
@@ -76,6 +77,7 @@ export class MediaController {
   /**
    * POST /api/v1/admin/media/upload
    */
+  @Audit({ action: 'UPLOAD', resource: 'media', category: 'MEDIA' })
   @Post('upload')
   @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(
@@ -121,6 +123,7 @@ export class MediaController {
    * PATCH /api/v1/admin/media/:id
    * Update alt text metadata
    */
+  @Audit({ action: 'UPDATE', resource: 'media', category: 'MEDIA' })
   @Patch(':id')
   @ApiParam({ name: 'id', description: 'ObjectId MongoDB du média' })
   @ApiOperation({ summary: 'Modifier le texte alternatif d\'un média' })
@@ -134,6 +137,7 @@ export class MediaController {
   /**
    * DELETE /api/v1/admin/media/:id
    */
+  @Audit({ action: 'DELETE', resource: 'media', category: 'MEDIA' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: 'id', description: 'ObjectId MongoDB du média' })

@@ -30,6 +30,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -137,6 +138,7 @@ export class EventsAdminController {
   /**
    * POST /api/v1/admin/events
    */
+  @Audit({ action: 'CREATE', resource: 'events', category: 'CONTENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -152,6 +154,7 @@ export class EventsAdminController {
   /**
    * PATCH /api/v1/admin/events/:id
    */
+  @Audit({ action: 'UPDATE', resource: 'events', category: 'CONTENT' })
   @Patch(':id')
   @ApiOperation({
     summary: 'Modifier un événement',
@@ -170,6 +173,7 @@ export class EventsAdminController {
   /**
    * DELETE /api/v1/admin/events/:id
    */
+  @Audit({ action: 'DELETE', resource: 'events', category: 'CONTENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({

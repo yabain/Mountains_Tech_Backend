@@ -8,6 +8,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 @ApiTags('Public - Contact')
 @Controller('public/contact')
@@ -42,6 +43,17 @@ export class ContactAdminController {
     return { success: true, data, message: 'Messages récupérés' };
   }
 
+  @Get(':id')
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB du message' })
+  @ApiOperation({ summary: 'Détail d\'un message de contact' })
+  @ApiResponse({ status: 200, description: 'Message trouvé' })
+  @ApiResponse({ status: 404, description: 'Message introuvable' })
+  async findOne(@Param('id') id: string) {
+    const data = await this.contactsService.findById(id);
+    return { success: true, data, message: 'Message récupéré' };
+  }
+
+  @Audit({ action: 'UPDATE', resource: 'contacts', category: 'COMMUNICATION' })
   @Patch(':id/status')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Changer le statut d\'un message', description: 'Transitions : NEW → IN_PROGRESS / SPAM ; IN_PROGRESS → RESOLVED / SPAM.' })

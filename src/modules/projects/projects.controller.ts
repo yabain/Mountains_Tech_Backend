@@ -28,6 +28,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -101,6 +102,7 @@ export class ProjectsAdminController {
   /**
    * POST /api/v1/admin/projects
    */
+  @Audit({ action: 'CREATE', resource: 'projects', category: 'CONTENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -117,6 +119,7 @@ export class ProjectsAdminController {
   /**
    * PATCH /api/v1/admin/projects/:id
    */
+  @Audit({ action: 'UPDATE', resource: 'projects', category: 'CONTENT' })
   @Patch(':id')
   @ApiOperation({
     summary: 'Modifier un projet',
@@ -135,6 +138,7 @@ export class ProjectsAdminController {
   /**
    * DELETE /api/v1/admin/projects/:id
    */
+  @Audit({ action: 'DELETE', resource: 'projects', category: 'CONTENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({

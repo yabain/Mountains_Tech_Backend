@@ -4,6 +4,7 @@ import { SettingsService } from './settings.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 @ApiTags('Public - Paramètres')
 @Controller('public/settings')
@@ -33,6 +34,7 @@ export class SettingsAdminController {
     return { success: true, data, message: 'Paramètres récupérés' };
   }
 
+  @Audit({ action: 'UPDATE', resource: 'settings', category: 'SETTINGS' })
   @Patch()
   @ApiOperation({ summary: 'Mettre à jour les paramètres', description: 'Upsert en masse - chaque clé/valeur est créée ou mise à jour.' })
   @ApiBody({ schema: { type: 'object', additionalProperties: true, example: { siteName: 'Mountains Tech', socialFacebook: 'https://fb.com/mountainstech' } } })

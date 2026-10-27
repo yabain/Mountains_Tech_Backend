@@ -28,6 +28,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -104,6 +105,7 @@ export class ActivitiesAdminController {
   /**
    * POST /api/v1/admin/activities
    */
+  @Audit({ action: 'CREATE', resource: 'activities', category: 'CONTENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -121,6 +123,7 @@ export class ActivitiesAdminController {
   /**
    * PATCH /api/v1/admin/activities/:id
    */
+  @Audit({ action: 'UPDATE', resource: 'activities', category: 'CONTENT' })
   @Patch(':id')
   @ApiOperation({
     summary: 'Modifier une activité',
@@ -139,6 +142,7 @@ export class ActivitiesAdminController {
   /**
    * DELETE /api/v1/admin/activities/:id
    */
+  @Audit({ action: 'DELETE', resource: 'activities', category: 'CONTENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({

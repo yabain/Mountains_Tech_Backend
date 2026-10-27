@@ -6,6 +6,7 @@ import { UpdatePartnerDto } from './dto/update-partner.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 @ApiTags('Admin - Partenaires')
 @ApiBearerAuth('access-token')
@@ -30,6 +31,7 @@ export class PartnersAdminController {
     return { success: true, data, message: 'Partenaire récupéré' };
   }
 
+  @Audit({ action: 'CREATE', resource: 'partners', category: 'CONTENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un partenaire' })
@@ -38,6 +40,7 @@ export class PartnersAdminController {
     return { success: true, data, message: 'Partenaire créé' };
   }
 
+  @Audit({ action: 'UPDATE', resource: 'partners', category: 'CONTENT' })
   @Patch(':id')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Modifier un partenaire' })
@@ -46,6 +49,7 @@ export class PartnersAdminController {
     return { success: true, data, message: 'Partenaire mis à jour' };
   }
 
+  @Audit({ action: 'DELETE', resource: 'partners', category: 'CONTENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: 'id' })

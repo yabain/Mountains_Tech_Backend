@@ -10,6 +10,7 @@ import { SubscribeDto } from './dto/subscribe.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ export class NewsletterAdminController {
   /**
    * DELETE /api/v1/admin/newsletter/subscribers/:id
    */
+  @Audit({ action: 'DELETE', resource: 'newsletter-subscribers', category: 'COMMUNICATION' })
   @Delete('subscribers/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: 'id' })

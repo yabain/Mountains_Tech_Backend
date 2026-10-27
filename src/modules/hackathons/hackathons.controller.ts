@@ -30,6 +30,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -155,6 +156,7 @@ export class HackathonsAdminController {
   /**
    * POST /api/v1/admin/hackathons
    */
+  @Audit({ action: 'CREATE', resource: 'hackathons', category: 'CONTENT' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer un hackathon' })
@@ -167,6 +169,7 @@ export class HackathonsAdminController {
   /**
    * PATCH /api/v1/admin/hackathons/:id
    */
+  @Audit({ action: 'UPDATE', resource: 'hackathons', category: 'CONTENT' })
   @Patch(':id')
   @ApiOperation({
     summary: 'Modifier un hackathon',
@@ -184,6 +187,7 @@ export class HackathonsAdminController {
   /**
    * DELETE /api/v1/admin/hackathons/:id
    */
+  @Audit({ action: 'DELETE', resource: 'hackathons', category: 'CONTENT' })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Supprimer un hackathon', description: 'Bloqué si statut PUBLISHED.' })
@@ -217,6 +221,7 @@ export class HackathonsAdminController {
   /**
    * PATCH /api/v1/admin/hackathons/teams/:teamId/status
    */
+  @Audit({ action: 'UPDATE', resource: 'hackathon-teams', category: 'CONTENT' })
   @Patch('teams/:teamId/status')
   @ApiOperation({
     summary: 'Valider ou refuser une équipe',

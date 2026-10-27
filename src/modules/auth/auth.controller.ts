@@ -22,6 +22,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 @ApiTags('Authentification')
 @Controller('auth')
@@ -31,6 +32,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/login
    */
+  @Audit({ action: 'LOGIN', resource: 'auth', category: 'AUTH' })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -98,6 +100,7 @@ export class AuthController {
   /**
    * POST /api/v1/auth/logout
    */
+  @Audit({ action: 'LOGOUT', resource: 'auth', category: 'AUTH' })
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)

@@ -28,6 +28,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 
@@ -111,6 +112,7 @@ export class MembersAdminController {
   /**
    * POST /api/v1/admin/members
    */
+  @Audit({ action: 'CREATE', resource: 'members', category: 'MEMBERSHIP' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -157,6 +159,19 @@ export class MembersAdminController {
   }
 
   /**
+   * GET /api/v1/admin/members/applications/:id
+   */
+  @Get('applications/:id')
+  @ApiOperation({ summary: "Détail d'une candidature d'adhésion" })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB de la candidature' })
+  @ApiResponse({ status: 200, description: 'Candidature trouvée' })
+  @ApiResponse({ status: 404, description: 'Candidature introuvable' })
+  async findOneApplication(@Param('id') id: string) {
+    const data = await this.membersService.findApplicationById(id);
+    return { success: true, data, message: 'Candidature récupérée' };
+  }
+
+  /**
    * GET /api/v1/admin/members/:id
    */
   @Get(':id')
@@ -172,6 +187,7 @@ export class MembersAdminController {
   /**
    * PATCH /api/v1/admin/members/:id/status
    */
+  @Audit({ action: 'UPDATE', resource: 'members', category: 'MEMBERSHIP' })
   @Patch(':id/status')
   @ApiOperation({
     summary: 'Valider / refuser / suspendre un membre',
@@ -194,6 +210,7 @@ export class MembersAdminController {
   /**
    * PATCH /api/v1/admin/members/applications/:id/status
    */
+  @Audit({ action: 'UPDATE', resource: 'member-applications', category: 'MEMBERSHIP' })
   @Patch('applications/:id/status')
   @ApiOperation({
     summary: 'Traiter une candidature',

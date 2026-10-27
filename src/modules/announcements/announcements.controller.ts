@@ -9,6 +9,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/decorators/current-user.decorator';
+import { Audit } from '../../common/decorators/audit.decorator';
 
 class ScheduleDto {
   @ApiProperty({ example: '2026-09-01T08:00:00Z' })
@@ -55,6 +56,7 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagne récupérée' };
   }
 
+  @Audit({ action: 'CREATE', resource: 'announcements', category: 'COMMUNICATION' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Créer une campagne', description: 'Crée une campagne DRAFT ou SCHEDULED. recipientCount calculé automatiquement.' })
@@ -63,6 +65,7 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagne créée' };
   }
 
+  @Audit({ action: 'UPDATE', resource: 'announcements', category: 'COMMUNICATION' })
   @Patch(':id')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Modifier une campagne (DRAFT / SCHEDULED seulement)' })
@@ -71,6 +74,7 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagne mise à jour' };
   }
 
+  @Audit({ action: 'SEND', resource: 'announcements', category: 'COMMUNICATION' })
   @Post(':id/send')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Envoyer immédiatement une campagne' })
@@ -79,6 +83,7 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagne mise en file d\'envoi' };
   }
 
+  @Audit({ action: 'SCHEDULE', resource: 'announcements', category: 'COMMUNICATION' })
   @Post(':id/schedule')
   @ApiParam({ name: 'id' })
   @ApiBody({ type: ScheduleDto })
@@ -88,6 +93,7 @@ export class AnnouncementsController {
     return { success: true, data, message: 'Campagne programmée' };
   }
 
+  @Audit({ action: 'CANCEL', resource: 'announcements', category: 'COMMUNICATION' })
   @Post(':id/cancel')
   @ApiParam({ name: 'id' })
   @ApiOperation({ summary: 'Annuler une campagne programmée' })
