@@ -52,8 +52,15 @@ export class AuditInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       finalize(() => {
+        const userName =
+          req.user?.firstName || req.user?.lastName
+            ? `${req.user.firstName ?? ''} ${req.user.lastName ?? ''}`.trim()
+            : undefined;
+
         void this.auditService.log({
           userId: req.user?.sub,
+          userEmail: req.user?.email,
+          userName,
           action: meta.action,
           resource: meta.resource,
           category: meta.category,

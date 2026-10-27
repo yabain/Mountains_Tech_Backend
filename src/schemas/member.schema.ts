@@ -62,7 +62,6 @@ export class Member {
 export const MemberSchema = SchemaFactory.createForClass(Member);
 
 // Index pour la recherche et le tri
-MemberSchema.index({ slug: 1 });
 MemberSchema.index({ status: 1 });
 MemberSchema.index({ sectors: 1 });
 MemberSchema.index({ companyName: 'text', description: 'text' });

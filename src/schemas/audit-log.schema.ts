@@ -8,6 +8,12 @@ export class AuditLog {
   @Prop({ type: String })
   userId?: string;
 
+  @Prop({ type: String })
+  userEmail?: string;
+
+  @Prop({ type: String })
+  userName?: string; // snapshot: "firstName lastName" au moment de l'action
+
   @Prop({ required: true })
   action!: string; // e.g. CREATE, UPDATE, DELETE, LOGIN, LOGOUT
 

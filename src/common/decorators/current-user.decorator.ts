@@ -4,6 +4,10 @@ export interface JwtPayload {
   sub: string;
   email: string;
   role: string;
+  // Enriched by JwtStrategy.validate() — not stored in the JWT token itself,
+  // added at request time from the DB document for audit and display purposes.
+  firstName?: string;
+  lastName?: string;
 }
 
 /**

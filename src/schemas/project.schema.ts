@@ -43,7 +43,6 @@ export class Project {
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
 
-ProjectSchema.index({ slug: 1 });
 ProjectSchema.index({ status: 1 });
 ProjectSchema.index({ tags: 1 });
 ProjectSchema.index({ title: 'text', excerpt: 'text' });

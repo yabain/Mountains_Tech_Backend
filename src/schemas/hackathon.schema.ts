@@ -51,6 +51,5 @@ export class Hackathon {
 
 export const HackathonSchema = SchemaFactory.createForClass(Hackathon);
 
-HackathonSchema.index({ slug: 1 });
 HackathonSchema.index({ status: 1 });
 HackathonSchema.index({ title: 'text', description: 'text' });

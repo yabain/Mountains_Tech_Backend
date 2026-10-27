@@ -33,7 +33,6 @@ export class Activity {
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);
 
-ActivitySchema.index({ slug: 1 });
 ActivitySchema.index({ status: 1 });
 ActivitySchema.index({ category: 1 });
 ActivitySchema.index({ title: 'text', excerpt: 'text' });

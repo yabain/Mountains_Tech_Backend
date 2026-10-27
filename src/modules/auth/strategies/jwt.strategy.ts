@@ -23,6 +23,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!user || user.status !== 'ACTIVE') {
       throw new UnauthorizedException('Token invalide ou compte inactif');
     }
-    return { sub: payload.sub, email: payload.email, role: payload.role };
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
   }
 }

@@ -16,5 +16,4 @@ export class Setting {
 }
 
 export const SettingSchema = SchemaFactory.createForClass(Setting);
-SettingSchema.index({ key: 1 });
 SettingSchema.index({ isPublic: 1 });

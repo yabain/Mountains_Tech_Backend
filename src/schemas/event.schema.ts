@@ -1,20 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export type EventDocument = EventEntity & Document;
 
-export class Panelist {
-  @Prop({ required: true })
-  name!: string;
-
-  @Prop({ required: true })
-  role!: string;
-
-  @Prop({ type: String })
+/**
+ * Panéliste d'un événement. Objet simple embarqué dans le document Event
+ * (pas de sous-document Mongoose distinct, pas de _id par panéliste).
+ */
+export interface Panelist {
+  name: string;
+  role: string;
   photoUrl?: string;
 }
 
-export const PanelistSchema = SchemaFactory.createForClass(Panelist);
+const PanelistSubSchema = new MongooseSchema(
+  {
+    name: { type: String, required: true },
+    role: { type: String, required: true },
+    photoUrl: { type: String },
+  },
+  { _id: false },
+);
 
 @Schema({ timestamps: true })
 export class EventEntity {
@@ -58,7 +64,7 @@ export class EventEntity {
   @Prop({ type: String })
   createdBy?: string;
 
-  @Prop({ type: [PanelistSchema], default: [] })
+  @Prop({ type: [PanelistSubSchema], default: [] })
   panelists!: Panelist[];
 }
 

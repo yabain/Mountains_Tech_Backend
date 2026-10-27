@@ -29,6 +29,21 @@ import { TrackingModule } from './modules/tracking/tracking.module';
 import { EmailsModule } from './modules/emails/emails.module';
 import { buildRedisConnection } from './infrastructure/queues/redis.config';
 
+// BullModule root is registered only when QUEUE_DRIVER=redis.
+// This prevents any Redis connection from being opened in noop mode.
+const bullRootImports =
+  process.env.QUEUE_DRIVER === 'redis'
+    ? [
+        BullModule.forRootAsync({
+          imports: [ConfigModule],
+          inject: [ConfigService],
+          useFactory: (config: ConfigService) => ({
+            connection: buildRedisConnection(config),
+          }),
+        }),
+      ]
+    : [];
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -49,19 +64,15 @@ import { buildRedisConnection } from './infrastructure/queues/redis.config';
       }),
     }),
 
-    // ─── BullMQ root connection ───────────────────────────────────────────────
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        connection: buildRedisConnection(config),
-      }),
-    }),
+    // ─── BullMQ root connection (only when QUEUE_DRIVER=redis) ───────────────
+    // When absent, no Redis connection is opened and the app will not crash
+    // if the Redis request limit is exceeded or the service is unreachable.
+    ...bullRootImports,
 
     StorageModule,
     MailModule,
     AuditModule,
-    QueuesModule,
+    QueuesModule.register(),
     UsersModule,
     AuthModule,
     MembersModule,

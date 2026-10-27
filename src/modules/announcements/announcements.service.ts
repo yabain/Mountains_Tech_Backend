@@ -1,14 +1,26 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
 import { Model, Types } from 'mongoose';
+
 import { Announcement, AnnouncementDocument } from '../../schemas/announcement.schema';
-import { AnnouncementRecipient, AnnouncementRecipientDocument } from '../../schemas/announcement-recipient.schema';
-import { NewsletterSubscriber, NewsletterSubscriberDocument } from '../../schemas/newsletter-subscriber.schema';
+import {
+  AnnouncementRecipient,
+  AnnouncementRecipientDocument,
+} from '../../schemas/announcement-recipient.schema';
+import {
+  NewsletterSubscriber,
+  NewsletterSubscriberDocument,
+} from '../../schemas/newsletter-subscriber.schema';
 import { CreateAnnouncementDto } from './dto/create-announcement.dto';
-import { ANNOUNCEMENT_QUEUE, AnnouncementJobs } from '../../infrastructure/queues/queue.constants';
-import type { AnnouncementJobData } from '../../infrastructure/queues/announcement.processor';
+import {
+  ANNOUNCEMENT_QUEUE_SERVICE,
+  type IAnnouncementQueueService,
+} from '../../infrastructure/queues/announcement-queue.service';
 
 @Injectable()
 export class AnnouncementsService {
@@ -22,8 +34,8 @@ export class AnnouncementsService {
     @InjectModel(NewsletterSubscriber.name)
     private readonly subscriberModel: Model<NewsletterSubscriberDocument>,
 
-    @InjectQueue(ANNOUNCEMENT_QUEUE)
-    private readonly announcementQueue: Queue<AnnouncementJobData>,
+    @Inject(ANNOUNCEMENT_QUEUE_SERVICE)
+    private readonly queueService: IAnnouncementQueueService,
   ) {}
 
   // ─── List / Get ──────────────────────────────────────────────────────────────
@@ -75,7 +87,6 @@ export class AnnouncementsService {
       throw new BadRequestException('scheduledAt est requis pour le mode SCHEDULED');
     }
 
-    // Count recipients before confirming
     const recipientCount = await this.countRecipients(dto.audience.groups);
 
     const doc = await this.announcementModel.create({
@@ -98,7 +109,9 @@ export class AnnouncementsService {
     if (!doc) throw new NotFoundException('Campagne introuvable');
 
     if (!['DRAFT', 'SCHEDULED'].includes(doc.status)) {
-      throw new BadRequestException('Seules les campagnes DRAFT ou SCHEDULED peuvent être modifiées');
+      throw new BadRequestException(
+        'Seules les campagnes DRAFT ou SCHEDULED peuvent être modifiées',
+      );
     }
 
     const updated = await this.announcementModel
@@ -120,24 +133,9 @@ export class AnnouncementsService {
       );
     }
 
-    // Add job to queue - immediate execution
-    const job = await this.announcementQueue.add(
-      AnnouncementJobs.SEND_NOW,
-      { announcementId: id },
-      {
-        attempts: 3,           // retry up to 3 times on failure
-        backoff: { type: 'exponential', delay: 5000 },
-        removeOnComplete: 100, // keep last 100 completed jobs
-        removeOnFail: 200,
-      },
-    );
+    const result = await this.queueService.sendNow(id);
 
-    return {
-      id,
-      jobId: job.id,
-      status: 'PROCESSING',
-      message: 'Campagne ajoutée à la file d\'envoi',
-    };
+    return { id, jobId: result.jobId, status: result.status, message: result.message };
   }
 
   async schedule(id: string, scheduledAt: string) {
@@ -149,39 +147,23 @@ export class AnnouncementsService {
     }
 
     const sendAt = new Date(scheduledAt);
-    const delay = sendAt.getTime() - Date.now();
-
-    if (delay <= 0) {
-      throw new BadRequestException('La date d\'envoi doit être dans le futur');
+    if (sendAt.getTime() <= Date.now()) {
+      throw new BadRequestException("La date d'envoi doit être dans le futur");
     }
 
-    // Add job to queue with delay
-    const job = await this.announcementQueue.add(
-      AnnouncementJobs.SEND_SCHEDULED,
-      { announcementId: id },
-      {
-        delay,
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 5000 },
-        removeOnComplete: 100,
-        removeOnFail: 200,
-      },
-    );
+    const result = await this.queueService.sendScheduled(id, sendAt);
 
-    await this.announcementModel.findByIdAndUpdate(id, {
-      $set: {
-        status: 'SCHEDULED',
-        scheduledAt: sendAt,
-        bullJobId: job.id,
-      },
-    }).exec();
+    await this.announcementModel
+      .findByIdAndUpdate(id, {
+        $set: {
+          status: 'SCHEDULED',
+          scheduledAt: sendAt,
+          ...(result.jobId ? { bullJobId: result.jobId } : {}),
+        },
+      })
+      .exec();
 
-    return {
-      id,
-      jobId: job.id,
-      status: 'SCHEDULED',
-      scheduledAt,
-    };
+    return { id, jobId: result.jobId, status: result.status, scheduledAt };
   }
 
   async cancel(id: string) {
@@ -192,18 +174,14 @@ export class AnnouncementsService {
       throw new BadRequestException('Seules les campagnes SCHEDULED peuvent être annulées');
     }
 
-    // Remove the job from the queue if it exists
     const bullJobId = (doc as AnnouncementDocument & { bullJobId?: string }).bullJobId;
     if (bullJobId) {
-      const job = await this.announcementQueue.getJob(bullJobId);
-      if (job) {
-        await job.remove();
-      }
+      await this.queueService.cancelJob(bullJobId);
     }
 
-    await this.announcementModel.findByIdAndUpdate(id, {
-      $set: { status: 'CANCELLED', bullJobId: null },
-    }).exec();
+    await this.announcementModel
+      .findByIdAndUpdate(id, { $set: { status: 'CANCELLED', bullJobId: null } })
+      .exec();
 
     return { id, status: 'CANCELLED' };
   }

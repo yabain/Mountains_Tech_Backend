@@ -5,6 +5,8 @@ import { AuditLog, AuditLogDocument } from '../../schemas/audit-log.schema';
 
 export interface AuditEntry {
   userId?: string;
+  userEmail?: string;
+  userName?: string;
   action: string;
   resource: string;
   resourceId?: string;
