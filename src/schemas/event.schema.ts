@@ -64,6 +64,7 @@ export class EventEntity {
 
 export const EventSchema = SchemaFactory.createForClass(EventEntity);
 
+EventSchema.index({ slug: 1 });
 EventSchema.index({ status: 1 });
 EventSchema.index({ startAt: 1 });
 EventSchema.index({ category: 1 });
