@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { RegisterEventDto } from './dto/register-event.dto';
 import { QueryEventsDto } from './dto/query-events.dto';
+import { AddPanelistDto, UpdatePanelistsDto } from './dto/panelist.dto';
 import { EventResponseDto, EventRegistrationResponseDto } from './dto/event-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -205,5 +207,52 @@ export class EventsAdminController {
   ) {
     const data = await this.eventsService.findRegistrations(id, +page, +limit);
     return { success: true, data, message: 'Liste des inscriptions récupérée' };
+  }
+
+  /**
+   * POST /api/v1/admin/events/:id/panelists
+   */
+  @Audit({ action: 'UPDATE', resource: 'events', category: 'CONTENT' })
+  @Post(':id/panelists')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Ajouter un panéliste à un événement' })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB de l\'événement' })
+  @ApiResponse({ status: 200, description: 'Panéliste ajouté' })
+  @ApiResponse({ status: 404, description: 'Événement introuvable' })
+  async addPanelist(@Param('id') id: string, @Body() dto: AddPanelistDto) {
+    const data = await this.eventsService.addPanelist(id, dto);
+    return { success: true, data, message: 'Panéliste ajouté' };
+  }
+
+  /**
+   * PUT /api/v1/admin/events/:id/panelists
+   */
+  @Audit({ action: 'UPDATE', resource: 'events', category: 'CONTENT' })
+  @Put(':id/panelists')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remplacer tous les panélistes d\'un événement' })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB de l\'événement' })
+  @ApiResponse({ status: 200, description: 'Liste mise à jour' })
+  @ApiResponse({ status: 404, description: 'Événement introuvable' })
+  async setPanelists(@Param('id') id: string, @Body() dto: UpdatePanelistsDto) {
+    const data = await this.eventsService.setPanelists(id, dto);
+    return { success: true, data, message: 'Panélistes mis à jour' };
+  }
+
+  /**
+   * DELETE /api/v1/admin/events/:id/panelists/:index
+   */
+  @Audit({ action: 'UPDATE', resource: 'events', category: 'CONTENT' })
+  @Delete(':id/panelists/:index')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Retirer un panéliste par index' })
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB de l\'événement' })
+  @ApiParam({ name: 'index', description: 'Index (0-based) du panéliste à retirer' })
+  @ApiResponse({ status: 200, description: 'Panéliste retiré' })
+  @ApiResponse({ status: 400, description: 'Index invalide' })
+  @ApiResponse({ status: 404, description: 'Événement introuvable' })
+  async removePanelist(@Param('id') id: string, @Param('index') index: string) {
+    const data = await this.eventsService.removePanelist(id, parseInt(index, 10));
+    return { success: true, data, message: 'Panéliste retiré' };
   }
 }

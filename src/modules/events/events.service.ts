@@ -12,6 +12,8 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { RegisterEventDto } from './dto/register-event.dto';
 import { QueryEventsDto } from './dto/query-events.dto';
+import { AddPanelistDto } from './dto/panelist.dto';
+import { UpdatePanelistsDto } from './dto/panelist.dto';
 
 import { MailService } from '../../infrastructure/mail/mail.service';
 
@@ -267,6 +269,61 @@ export class EventsService {
       items: docs.map((d) => this.toObject(d)),
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
+  }
+
+  async addPanelist(eventId: string, dto: AddPanelistDto) {
+    const updated = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        {
+          $push: {
+            panelists: {
+              name: dto.name,
+              role: dto.role,
+              photoUrl: dto.photoUrl,
+            },
+          },
+        },
+        { new: true },
+      )
+      .exec();
+
+    if (!updated) throw new NotFoundException('Événement introuvable');
+    return this.toObject(updated);
+  }
+
+  async setPanelists(eventId: string, dto: UpdatePanelistsDto) {
+    const updated = await this.eventModel
+      .findByIdAndUpdate(
+        eventId,
+        { $set: { panelists: dto.panelists } },
+        { new: true },
+      )
+      .exec();
+
+    if (!updated) throw new NotFoundException('Événement introuvable');
+    return this.toObject(updated);
+  }
+
+  async removePanelist(eventId: string, panelistIndex: number) {
+    const doc = await this.eventModel.findById(eventId).exec();
+    if (!doc) throw new NotFoundException('Événement introuvable');
+
+    const panelists = doc.panelists ?? [];
+    if (!Number.isInteger(panelistIndex) || panelistIndex < 0 || panelistIndex >= panelists.length) {
+      throw new BadRequestException('Index de panéliste invalide');
+    }
+
+    await this.eventModel
+      .updateOne({ _id: new Types.ObjectId(eventId) }, { $unset: { [`panelists.${panelistIndex}`]: 1 } })
+      .exec();
+
+    const updated = await this.eventModel
+      .findByIdAndUpdate(eventId, { $pull: { panelists: null } }, { new: true })
+      .exec();
+
+    if (!updated) throw new NotFoundException('Événement introuvable');
+    return this.toObject(updated);
   }
 
   // ─── Helpers ─────────────────────────────────────────────────────────────────

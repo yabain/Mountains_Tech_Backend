@@ -3,6 +3,19 @@ import { Document } from 'mongoose';
 
 export type EventDocument = EventEntity & Document;
 
+export class Panelist {
+  @Prop({ required: true })
+  name!: string;
+
+  @Prop({ required: true })
+  role!: string;
+
+  @Prop({ type: String })
+  photoUrl?: string;
+}
+
+export const PanelistSchema = SchemaFactory.createForClass(Panelist);
+
 @Schema({ timestamps: true })
 export class EventEntity {
   @Prop({ required: true })
@@ -44,11 +57,13 @@ export class EventEntity {
 
   @Prop({ type: String })
   createdBy?: string;
+
+  @Prop({ type: [PanelistSchema], default: [] })
+  panelists!: Panelist[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(EventEntity);
 
-EventSchema.index({ slug: 1 });
 EventSchema.index({ status: 1 });
 EventSchema.index({ startAt: 1 });
 EventSchema.index({ category: 1 });
