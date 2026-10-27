@@ -17,6 +17,12 @@ import { NewsletterSubscriber, NewsletterSubscriberSchema } from '../../schemas/
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         connection: buildRedisConnection(config),
+        defaultJobOptions: {
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 5000 },
+          removeOnComplete: 100,
+          removeOnFail: 50,
+        },
       }),
     }),
 

@@ -22,11 +22,6 @@ export class UpdateActivityDto {
   @IsString()
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML mis à jour</p>' })
-  @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/new-cover.webp' })
   @IsOptional()
   @IsUrl()

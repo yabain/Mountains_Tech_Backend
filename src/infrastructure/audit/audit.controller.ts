@@ -14,18 +14,25 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Liste des logs d\'audit', description: 'Accessible uniquement au SUPER_ADMIN.' })
+  @ApiOperation({ summary: "Liste des logs d'audit", description: 'Accessible uniquement au SUPER_ADMIN.' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'resource', required: false, description: 'Filtrer par ressource (users, members, ...)' })
   @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'category', required: false })
+  @ApiQuery({ name: 'method', required: false })
+  @ApiQuery({ name: 'statusCode', required: false })
   async findAll(
     @Query('page') page = 1,
     @Query('limit') limit = 50,
     @Query('resource') resource?: string,
     @Query('userId') userId?: string,
+    @Query('category') category?: string,
+    @Query('method') method?: string,
+    @Query('statusCode') statusCode?: string,
   ) {
-    const data = await this.auditService.findAll(+page, +limit, resource, userId);
+    const data = await this.auditService.findAll(+page, +limit, resource, userId, category, method, statusCode);
     return { success: true, data, message: 'Logs récupérés' };
   }
 }
+

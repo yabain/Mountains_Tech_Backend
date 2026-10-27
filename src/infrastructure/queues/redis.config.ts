@@ -12,7 +12,13 @@ export function buildRedisConnection(config: ConfigService): Record<string, unkn
     url,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
-    lazyConnect: true,
+    lazyConnect: false,
+    connectTimeout: 10000,   // 10s max pour se connecter
+    commandTimeout: 5000,
+    retryStrategy: (times: number) => {
+      if (times > 3) return null; // Abandon après 3 tentatives
+      return Math.min(times * 500, 2000);
+    },
     ...(isTls && {
       tls: {
         rejectUnauthorized: false, // Required for Upstash self-signed certs

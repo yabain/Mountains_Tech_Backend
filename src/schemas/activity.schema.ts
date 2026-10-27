@@ -15,9 +15,6 @@ export class Activity {
   excerpt?: string;
 
   @Prop({ type: String })
-  contentHtml?: string;
-
-  @Prop({ type: String })
   coverUrl?: string;
 
   @Prop({ type: String })

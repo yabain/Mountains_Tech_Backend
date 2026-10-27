@@ -17,6 +17,18 @@ export class AuditLog {
   @Prop({ type: String })
   resourceId?: string;
 
+  @Prop({ type: String })
+  category?: string;
+
+  @Prop({ type: String })
+  method?: string;
+
+  @Prop({ type: String })
+  path?: string;
+
+  @Prop({ type: Number })
+  statusCode?: number;
+
   @Prop({ type: Object })
   metadata?: Record<string, unknown>;
 
@@ -30,4 +42,8 @@ export class AuditLog {
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
 AuditLogSchema.index({ userId: 1 });
 AuditLogSchema.index({ resource: 1, action: 1 });
+AuditLogSchema.index({ category: 1 });
+AuditLogSchema.index({ method: 1 });
+AuditLogSchema.index({ statusCode: 1 });
 AuditLogSchema.index({ createdAt: -1 });
+

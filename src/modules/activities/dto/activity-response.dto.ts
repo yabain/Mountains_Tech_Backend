@@ -13,9 +13,6 @@ export class ActivityResponseDto {
   @ApiPropertyOptional({ example: 'Un résumé court de l\'activité' })
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML</p>' })
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   coverUrl?: string;
 

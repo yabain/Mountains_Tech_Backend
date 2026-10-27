@@ -13,9 +13,6 @@ export class ProjectResponseDto {
   @ApiPropertyOptional({ example: 'Résumé court du projet' })
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML</p>' })
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/project.webp' })
   coverUrl?: string;
 

@@ -181,7 +181,6 @@ export class HackathonsService {
       title: dto.title,
       slug,
       description: dto.description,
-      rulesHtml: dto.rulesHtml,
       coverUrl: dto.coverUrl,
       startDate: dto.startDate ? new Date(dto.startDate) : undefined,
       endDate: dto.endDate ? new Date(dto.endDate) : undefined,
@@ -215,7 +214,6 @@ export class HackathonsService {
 
     if (dto.title !== undefined) updateData['title'] = dto.title;
     if (dto.description !== undefined) updateData['description'] = dto.description;
-    if (dto.rulesHtml !== undefined) updateData['rulesHtml'] = dto.rulesHtml;
     if (dto.coverUrl !== undefined) updateData['coverUrl'] = dto.coverUrl;
     if (dto.startDate !== undefined) updateData['startDate'] = new Date(dto.startDate);
     if (dto.endDate !== undefined) updateData['endDate'] = new Date(dto.endDate);

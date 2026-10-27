@@ -28,11 +28,6 @@ export class UpdateEventDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   @IsUrl()
   coverUrl?: string;
 

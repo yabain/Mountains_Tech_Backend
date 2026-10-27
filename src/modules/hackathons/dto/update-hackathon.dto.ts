@@ -28,11 +28,6 @@ export class UpdateHackathonDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  rulesHtml?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   @IsUrl()
   coverUrl?: string;
 

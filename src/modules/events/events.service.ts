@@ -179,7 +179,6 @@ export class EventsService {
       title: dto.title,
       slug,
       excerpt: dto.excerpt,
-      contentHtml: dto.contentHtml,
       coverUrl: dto.coverUrl,
       category: dto.category,
       location: dto.location,
@@ -212,7 +211,6 @@ export class EventsService {
 
     if (dto.title !== undefined) updateData['title'] = dto.title;
     if (dto.excerpt !== undefined) updateData['excerpt'] = dto.excerpt;
-    if (dto.contentHtml !== undefined) updateData['contentHtml'] = dto.contentHtml;
     if (dto.coverUrl !== undefined) updateData['coverUrl'] = dto.coverUrl;
     if (dto.category !== undefined) updateData['category'] = dto.category;
     if (dto.location !== undefined) updateData['location'] = dto.location;

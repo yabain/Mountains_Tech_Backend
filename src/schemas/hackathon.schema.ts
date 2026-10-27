@@ -15,9 +15,6 @@ export class Hackathon {
   description?: string;
 
   @Prop({ type: String })
-  rulesHtml?: string;
-
-  @Prop({ type: String })
   coverUrl?: string;
 
   @Prop({ type: Date })

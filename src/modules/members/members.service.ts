@@ -206,6 +206,12 @@ export class MembersService {
     };
   }
 
+  async findApplicationById(id: string) {
+    const doc = await this.applicationModel.findById(id).exec();
+    if (!doc) throw new NotFoundException('Candidature introuvable');
+    return this.toObject(doc);
+  }
+
   async updateStatus(id: string, dto: UpdateMemberStatusDto, reviewerId: string) {
     const doc = await this.memberModel.findById(id).exec();
     if (!doc) throw new NotFoundException('Membre introuvable');

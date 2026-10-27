@@ -111,7 +111,6 @@ export class ActivitiesService {
       title: dto.title,
       slug,
       excerpt: dto.excerpt,
-      contentHtml: dto.contentHtml,
       coverUrl: dto.coverUrl,
       category: dto.category,
       status: dto.status ?? 'DRAFT',
@@ -140,7 +139,6 @@ export class ActivitiesService {
 
     if (dto.title !== undefined) updateData['title'] = dto.title;
     if (dto.excerpt !== undefined) updateData['excerpt'] = dto.excerpt;
-    if (dto.contentHtml !== undefined) updateData['contentHtml'] = dto.contentHtml;
     if (dto.coverUrl !== undefined) updateData['coverUrl'] = dto.coverUrl;
     if (dto.category !== undefined) updateData['category'] = dto.category;
 

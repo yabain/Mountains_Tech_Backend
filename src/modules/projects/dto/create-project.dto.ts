@@ -25,11 +25,6 @@ export class CreateProjectDto {
   @IsString()
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML détaillé du projet</p>' })
-  @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/project.webp' })
   @IsOptional()
   @IsUrl()

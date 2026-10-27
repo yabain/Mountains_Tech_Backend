@@ -15,9 +15,6 @@ export class Project {
   excerpt?: string;
 
   @Prop({ type: String })
-  contentHtml?: string;
-
-  @Prop({ type: String })
   coverUrl?: string;
 
   @Prop({ type: Date })

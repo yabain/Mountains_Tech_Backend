@@ -27,11 +27,6 @@ export class CreateHackathonDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: '<p>Règlement officiel du hackathon</p>' })
-  @IsOptional()
-  @IsString()
-  rulesHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   @IsOptional()
   @IsUrl()

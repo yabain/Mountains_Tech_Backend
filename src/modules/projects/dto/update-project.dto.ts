@@ -26,11 +26,6 @@ export class UpdateProjectDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   @IsUrl()
   coverUrl?: string;
 

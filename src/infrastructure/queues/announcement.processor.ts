@@ -1,5 +1,5 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Job } from 'bullmq';
 import { Model, Types } from 'mongoose';
@@ -13,9 +13,26 @@ export interface AnnouncementJobData {
   announcementId: string;
 }
 
-@Processor(ANNOUNCEMENT_QUEUE)
-export class AnnouncementProcessor extends WorkerHost {
+@Processor(ANNOUNCEMENT_QUEUE, {
+  // Upstash free tier guard: when the queue is empty, BullMQ waits `drainDelay`
+  // ms before polling again. Default is 5ms → ~200 req/s of pure idle traffic.
+  // 30 000ms (30s) keeps idle usage under ~3 req/min, well within the free plan.
+  drainDelay: 30_000,
+  // Only one concurrent job at a time — newsletters are SMTP-bound, not CPU-bound.
+  concurrency: 1,
+})
+export class AnnouncementProcessor extends WorkerHost implements OnModuleInit {
   private readonly logger = new Logger(AnnouncementProcessor.name);
+
+  onModuleInit() {
+    if (process.env.DISABLE_QUEUE_WORKER === 'true') {
+      this.logger.warn(
+        'DISABLE_QUEUE_WORKER=true — BullMQ worker is paused. No Redis polling will occur.',
+      );
+      // Pause the underlying worker immediately so it stops polling Redis
+      void this.worker.pause();
+    }
+  }
 
   // Batch size - send emails in groups to avoid overwhelming the SMTP server
   private readonly BATCH_SIZE = 20;

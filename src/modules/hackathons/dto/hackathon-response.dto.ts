@@ -13,9 +13,6 @@ export class HackathonResponseDto {
   @ApiPropertyOptional({ example: 'Hackathon annuel de Mountains Tech' })
   description?: string;
 
-  @ApiPropertyOptional({ example: '<p>Règlement</p>' })
-  rulesHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   coverUrl?: string;
 

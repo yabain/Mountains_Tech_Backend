@@ -27,11 +27,6 @@ export class CreateEventDto {
   @IsString()
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML détaillé de l\'événement</p>' })
-  @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   @IsOptional()
   @IsUrl()

@@ -8,6 +8,10 @@ export interface AuditEntry {
   action: string;
   resource: string;
   resourceId?: string;
+  category?: string;
+  method?: string;
+  path?: string;
+  statusCode?: number;
   metadata?: Record<string, unknown>;
   ip?: string;
   userAgent?: string;
@@ -31,10 +35,21 @@ export class AuditService {
     }
   }
 
-  async findAll(page = 1, limit = 50, resource?: string, userId?: string) {
+  async findAll(
+    page = 1,
+    limit = 50,
+    resource?: string,
+    userId?: string,
+    category?: string,
+    method?: string,
+    statusCode?: string,
+  ) {
     const filter: Record<string, unknown> = {};
     if (resource) filter['resource'] = resource;
     if (userId) filter['userId'] = userId;
+    if (category) filter['category'] = category;
+    if (method) filter['method'] = method;
+    if (statusCode) filter['statusCode'] = Number(statusCode);
 
     const skip = (page - 1) * limit;
     const [docs, total] = await Promise.all([
@@ -51,4 +66,5 @@ export class AuditService {
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     };
   }
+
 }

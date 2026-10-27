@@ -26,11 +26,6 @@ export class CreateActivityDto {
   @IsString()
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML de l\'activité</p>' })
-  @IsOptional()
-  @IsString()
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   @IsOptional()
   @IsUrl()

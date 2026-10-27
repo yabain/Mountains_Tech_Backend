@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Request } from 'express';
+import { finalize } from 'rxjs/operators';
+import { Request, Response } from 'express';
 import { AuditService } from '../../infrastructure/audit/audit.service';
 import type { JwtPayload } from '../decorators/current-user.decorator';
 
@@ -16,6 +16,7 @@ export const AUDIT_KEY = 'audit';
 export interface AuditMeta {
   action: string;
   resource: string;
+  category?: string;
 }
 
 /**
@@ -38,17 +39,32 @@ export class AuditInterceptor implements NestInterceptor {
     if (!meta) return next.handle();
 
     const req = ctx.switchToHttp().getRequest<Request & { user?: JwtPayload }>();
+    const res = ctx.switchToHttp().getResponse<Response>();
+
+    const ip =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      req.ip ||
+      req.socket?.remoteAddress ||
+      undefined;
+
+    const method = req.method;
+    const path = req.originalUrl || req.url;
 
     return next.handle().pipe(
-      tap(() => {
+      finalize(() => {
         void this.auditService.log({
           userId: req.user?.sub,
           action: meta.action,
           resource: meta.resource,
-          ip: req.ip,
-          userAgent: req.headers['user-agent'],
+          category: meta.category,
+          method,
+          path,
+          statusCode: res.statusCode,
+          ip,
+          userAgent: req.headers['user-agent'] as string | undefined,
         });
       }),
     );
   }
 }
+

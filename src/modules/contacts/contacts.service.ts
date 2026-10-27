@@ -52,6 +52,14 @@ export class ContactsService {
     };
   }
 
+  async findById(id: string) {
+    const doc = await this.contactModel.findById(id).exec();
+    if (!doc) throw new NotFoundException('Message introuvable');
+    const obj = doc.toObject({ virtuals: true }) as unknown as Record<string, unknown>;
+    delete obj['__v'];
+    return obj;
+  }
+
   async updateStatus(id: string, dto: UpdateContactStatusDto, handledBy: string) {
     const doc = await this.contactModel.findById(id).exec();
     if (!doc) throw new NotFoundException('Message introuvable');

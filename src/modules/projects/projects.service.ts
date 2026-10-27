@@ -125,7 +125,6 @@ export class ProjectsService {
       title: dto.title,
       slug,
       excerpt: dto.excerpt,
-      contentHtml: dto.contentHtml,
       coverUrl: dto.coverUrl,
       startDate: dto.startDate ? new Date(dto.startDate) : undefined,
       endDate: dto.endDate ? new Date(dto.endDate) : undefined,
@@ -156,7 +155,6 @@ export class ProjectsService {
 
     if (dto.title !== undefined) updateData['title'] = dto.title;
     if (dto.excerpt !== undefined) updateData['excerpt'] = dto.excerpt;
-    if (dto.contentHtml !== undefined) updateData['contentHtml'] = dto.contentHtml;
     if (dto.coverUrl !== undefined) updateData['coverUrl'] = dto.coverUrl;
     if (dto.startDate !== undefined) updateData['startDate'] = new Date(dto.startDate);
     if (dto.endDate !== undefined) updateData['endDate'] = new Date(dto.endDate);

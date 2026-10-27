@@ -25,6 +25,8 @@ import { StorageModule } from './infrastructure/storage/storage.module';
 import { MailModule } from './infrastructure/mail/mail.module';
 import { AuditModule } from './infrastructure/audit/audit.module';
 import { QueuesModule } from './infrastructure/queues/queues.module';
+import { TrackingModule } from './modules/tracking/tracking.module';
+import { EmailsModule } from './modules/emails/emails.module';
 import { buildRedisConnection } from './infrastructure/queues/redis.config';
 
 @Module({
@@ -75,6 +77,8 @@ import { buildRedisConnection } from './infrastructure/queues/redis.config';
     SettingsModule,
     DashboardModule,
     HealthModule,
+    TrackingModule,
+    EmailsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -13,9 +13,6 @@ export class EventResponseDto {
   @ApiPropertyOptional({ example: 'Présentation des dernières avancées en IA générative' })
   excerpt?: string;
 
-  @ApiPropertyOptional({ example: '<p>Contenu HTML</p>' })
-  contentHtml?: string;
-
   @ApiPropertyOptional({ example: 'https://cdn.example/cover.webp' })
   coverUrl?: string;
 
