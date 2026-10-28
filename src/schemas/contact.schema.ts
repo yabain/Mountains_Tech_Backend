@@ -21,6 +21,13 @@ export class Contact {
   @Prop({ type: String, default: 'NEW' })
   status!: string;
 
+  // Lu / Non lu — indépendant du statut de traitement
+  @Prop({ type: Boolean, default: false })
+  isRead!: boolean;
+
+  @Prop({ type: Date })
+  readAt?: Date;
+
   @Prop({ type: String })
   handledBy?: string;
 
@@ -33,4 +40,5 @@ export class Contact {
 
 export const ContactSchema = SchemaFactory.createForClass(Contact);
 ContactSchema.index({ status: 1 });
+ContactSchema.index({ isRead: 1 });
 ContactSchema.index({ email: 1 });

@@ -60,6 +60,21 @@ export class ContactsService {
     return obj;
   }
 
+  async setRead(id: string, isRead: boolean) {
+    const updated = await this.contactModel
+      .findByIdAndUpdate(
+        id,
+        { $set: { isRead, readAt: isRead ? new Date() : null } },
+        { new: true },
+      )
+      .exec();
+
+    if (!updated) throw new NotFoundException('Message introuvable');
+    const obj = updated.toObject({ virtuals: true }) as unknown as Record<string, unknown>;
+    delete obj['__v'];
+    return obj;
+  }
+
   async updateStatus(id: string, dto: UpdateContactStatusDto, handledBy: string) {
     const doc = await this.contactModel.findById(id).exec();
     if (!doc) throw new NotFoundException('Message introuvable');

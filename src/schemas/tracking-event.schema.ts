@@ -20,6 +20,15 @@ export class TrackingEvent {
   @Prop({ type: String })
   event?: string; // page_view, click, form_submit, etc.
 
+  @Prop({ type: String, index: true })
+  entityType?: 'event' | 'hackathon' | 'project' | 'activity' | 'partner' | 'member' | 'announcement';
+
+  @Prop({ type: String, index: true })
+  entityId?: string;
+
+  @Prop({ type: String, index: true })
+  entitySlug?: string;
+
   @Prop({ type: String })
   ip?: string;
 
@@ -35,3 +44,6 @@ TrackingEventSchema.index({ createdAt: -1 });
 TrackingEventSchema.index({ visitorId: 1, createdAt: -1 });
 TrackingEventSchema.index({ page: 1 });
 TrackingEventSchema.index({ event: 1 });
+TrackingEventSchema.index({ entityType: 1, entitySlug: 1 });
+TrackingEventSchema.index({ entityType: 1, entityId: 1 });
+

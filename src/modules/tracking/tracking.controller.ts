@@ -57,4 +57,28 @@ export class TrackingController {
     const data = await this.trackingService.getActiveVisitors(minutes ? parseInt(minutes, 10) : 5);
     return { success: true, data, message: 'Visiteurs actifs récupérés' };
   }
+
+  @Get('pages')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN', 'ADMIN')
+  @ApiOperation({ summary: "Statistiques des pages du portail public (home, about, membres, événements, projets, hackathons, partenaires, contact)" })
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Période en jours (défaut 30)' })
+  async getPublicPagesStats(@Query('days') days?: string) {
+    const data = await this.trackingService.getPublicPagesStats(days ? parseInt(days, 10) : 30);
+    return { success: true, data, message: 'Statistiques des pages récupérées' };
+  }
+
+  @Get('entities')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN', 'ADMIN')
+  @ApiOperation({ summary: "Statistiques des fiches individuelles (ed-cnt) par événement/hackathon/projet/..." })
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Période en jours (défaut 30)' })
+  @ApiQuery({ name: 'entityType', required: false, enum: ['event', 'hackathon', 'project', 'activity', 'partner', 'member', 'announcement'] })
+  async getEntityStats(@Query('days') days?: string, @Query('entityType') entityType?: string) {
+    const data = await this.trackingService.getEntityStats(days ? parseInt(days, 10) : 30, entityType);
+    return { success: true, data, message: 'Statistiques des fiches individuelles récupérées' };
+  }
 }
+

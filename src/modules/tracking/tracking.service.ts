@@ -22,12 +22,16 @@ export class TrackingService {
       page: dto.page,
       referer: dto.referer,
       event: dto.event ?? 'page_view',
+      entityType: dto.entityType,
+      entityId: dto.entityId,
+      entitySlug: dto.entitySlug,
       ip,
       userAgent,
       metadata: dto.metadata,
     });
     return event;
   }
+
 
   async getMetrics() {
     const now = new Date();
@@ -144,4 +148,91 @@ export class TrackingService {
       minutes,
     };
   }
+
+  async getPublicPagesStats(days: number = 30) {
+    const from = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const stats = await this.trackingModel.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: from },
+          event: 'page_view',
+          entityType: { $exists: false },
+        },
+      },
+      {
+        $group: {
+          _id: '$page',
+          views: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$visitorId' },
+        },
+      },
+      {
+        $project: {
+          page: '$_id',
+          views: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          _id: 0,
+        },
+      },
+      {
+        $sort: { views: -1 },
+      },
+    ]);
+
+    return {
+      days,
+      pages: stats,
+    };
+  }
+
+  async getEntityStats(days: number = 30, entityType?: string) {
+    const from = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const match: Record<string, unknown> = {
+      createdAt: { $gte: from },
+      event: 'page_view',
+      entityType: { $exists: true, $ne: null },
+    };
+
+    if (entityType) {
+      match['entityType'] = entityType;
+    }
+
+    const stats = await this.trackingModel.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: {
+            entityType: '$entityType',
+            entitySlug: '$entitySlug',
+            entityId: '$entityId',
+            page: '$page',
+          },
+          views: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$visitorId' },
+        },
+      },
+      {
+        $project: {
+          entityType: '$_id.entityType',
+          entityId: '$_id.entityId',
+          entitySlug: '$_id.entitySlug',
+          page: '$_id.page',
+          views: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          _id: 0,
+        },
+      },
+      {
+        $sort: { views: -1 },
+      },
+    ]);
+
+    return {
+      days,
+      entities: stats,
+    };
+  }
 }
+

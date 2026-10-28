@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags }
 import { ContactsService } from './contacts.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactStatusDto } from './dto/update-contact-status.dto';
+import { ToggleContactReadDto } from './dto/toggle-contact-read.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -60,5 +61,16 @@ export class ContactAdminController {
   async updateStatus(@Param('id') id: string, @Body() dto: UpdateContactStatusDto, @CurrentUser() user: JwtPayload) {
     const data = await this.contactsService.updateStatus(id, dto, user.sub);
     return { success: true, data, message: 'Statut mis à jour' };
+  }
+
+  @Audit({ action: 'UPDATE', resource: 'contacts', category: 'COMMUNICATION' })
+  @Patch(':id/read')
+  @ApiParam({ name: 'id', description: 'ObjectId MongoDB du message' })
+  @ApiOperation({ summary: 'Marquer un message comme lu / non lu', description: 'Bascule le booléen isRead. true = Lu, false = Non lu.' })
+  @ApiResponse({ status: 200, description: 'Statut de lecture mis à jour' })
+  @ApiResponse({ status: 404, description: 'Message introuvable' })
+  async setRead(@Param('id') id: string, @Body() dto: ToggleContactReadDto) {
+    const data = await this.contactsService.setRead(id, dto.isRead);
+    return { success: true, data, message: 'Statut de lecture mis à jour' };
   }
 }

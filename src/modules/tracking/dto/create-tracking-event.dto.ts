@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateTrackingEventDto {
   @ApiProperty({ description: 'Identifiant unique du visiteur' })
@@ -27,8 +27,25 @@ export class CreateTrackingEventDto {
   @IsString()
   event?: string;
 
+  @ApiPropertyOptional({ description: "Type d'entité pour les pages détail", enum: ['event', 'hackathon', 'project', 'activity', 'partner', 'member', 'announcement'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['event', 'hackathon', 'project', 'activity', 'partner', 'member', 'announcement'])
+  entityType?: 'event' | 'hackathon' | 'project' | 'activity' | 'partner' | 'member' | 'announcement';
+
+  @ApiPropertyOptional({ description: "ID de l'entité" })
+  @IsOptional()
+  @IsString()
+  entityId?: string;
+
+  @ApiPropertyOptional({ description: "Slug de l'entité" })
+  @IsOptional()
+  @IsString()
+  entitySlug?: string;
+
   @ApiPropertyOptional({ description: 'Métadonnées additionnelles' })
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
 }
+
